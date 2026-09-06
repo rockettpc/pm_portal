@@ -3,6 +3,8 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { Navbar } from './components/Navbar';
 import { LoginView } from './components/LoginView';
 import { EquipmentView } from './components/EquipmentView';
+import { PartsRequestsView } from './components/PartsRequestsView';
+import { PartsCatalogView } from './components/PartsCatalogView';
 import { UserManagementView } from './components/UserManagementView';
 
 const MainLayout = () => {
@@ -27,6 +29,8 @@ const MainLayout = () => {
       <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {activeTab === 'equipment' && <EquipmentView />}
+        {activeTab === 'parts-requests' && <PartsRequestsView />}
+        {activeTab === 'parts-catalog' && <PartsCatalogView />}
         {activeTab === 'users' && ['admin', 'manager'].includes(user?.role) && <UserManagementView />}
       </main>
     </div>

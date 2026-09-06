@@ -63,6 +63,28 @@ export const Navbar = ({ activeTab, setActiveTab }) => {
               {user?.role === 'operator' ? t('nav.my_equipment') : t('nav.equipment')}
             </button>
 
+            <button
+              onClick={() => setActiveTab('parts-requests')}
+              className={`px-3 py-1.5 rounded-md text-sm font-medium transition ${
+                activeTab === 'parts-requests'
+                  ? 'bg-emerald-600/20 text-emerald-400 border border-emerald-500/30'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-800'
+              }`}
+            >
+              {t('nav.parts_requests')}
+            </button>
+
+            <button
+              onClick={() => setActiveTab('parts-catalog')}
+              className={`px-3 py-1.5 rounded-md text-sm font-medium transition ${
+                activeTab === 'parts-catalog'
+                  ? 'bg-emerald-600/20 text-emerald-400 border border-emerald-500/30'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-800'
+              }`}
+            >
+              {t('nav.parts_catalog')}
+            </button>
+
             {['admin', 'manager'].includes(user?.role) && (
               <button
                 onClick={() => setActiveTab('users')}

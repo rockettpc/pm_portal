@@ -8,6 +8,8 @@ import userRoutes from './routes/users.js';
 import equipmentRoutes from './routes/equipment.js';
 import locationRoutes from './routes/locations.js';
 import documentRoutes from './routes/documents.js';
+import partsRoutes from './routes/parts.js';
+import partsRequestsRoutes from './routes/partsRequests.js';
 
 dotenv.config();
 
@@ -43,6 +45,8 @@ app.get('/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/equipment', equipmentRoutes);
+app.use('/api/parts', partsRoutes);
+app.use('/api/parts-requests', partsRequestsRoutes);
 app.use('/api', locationRoutes);
 app.use('/api', documentRoutes);
 
