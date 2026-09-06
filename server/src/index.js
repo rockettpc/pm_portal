@@ -10,6 +10,8 @@ import locationRoutes from './routes/locations.js';
 import documentRoutes from './routes/documents.js';
 import partsRoutes from './routes/parts.js';
 import partsRequestsRoutes from './routes/partsRequests.js';
+import pmSchedulesRoutes from './routes/pmSchedules.js';
+import workOrdersRoutes from './routes/workOrders.js';
 
 dotenv.config();
 
@@ -47,6 +49,8 @@ app.use('/api/users', userRoutes);
 app.use('/api/equipment', equipmentRoutes);
 app.use('/api/parts', partsRoutes);
 app.use('/api/parts-requests', partsRequestsRoutes);
+app.use('/api/pm-schedules', pmSchedulesRoutes);
+app.use('/api/work-orders', workOrdersRoutes);
 app.use('/api', locationRoutes);
 app.use('/api', documentRoutes);
 

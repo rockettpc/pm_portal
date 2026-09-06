@@ -64,6 +64,28 @@ export const Navbar = ({ activeTab, setActiveTab }) => {
             </button>
 
             <button
+              onClick={() => setActiveTab('work-orders')}
+              className={`px-3 py-1.5 rounded-md text-sm font-medium transition ${
+                activeTab === 'work-orders'
+                  ? 'bg-emerald-600/20 text-emerald-400 border border-emerald-500/30'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-800'
+              }`}
+            >
+              {t('nav.work_orders')}
+            </button>
+
+            <button
+              onClick={() => setActiveTab('pm-schedules')}
+              className={`px-3 py-1.5 rounded-md text-sm font-medium transition ${
+                activeTab === 'pm-schedules'
+                  ? 'bg-emerald-600/20 text-emerald-400 border border-emerald-500/30'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-800'
+              }`}
+            >
+              {t('nav.pm_schedules')}
+            </button>
+
+            <button
               onClick={() => setActiveTab('parts-requests')}
               className={`px-3 py-1.5 rounded-md text-sm font-medium transition ${
                 activeTab === 'parts-requests'
