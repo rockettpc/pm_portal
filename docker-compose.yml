@@ -51,6 +51,7 @@ services:
       - "3001:3001"
     environment:
       VITE_API_URL: http://localhost:5050
+      BACKEND_PROXY_URL: http://pm_backend:5050
     volumes:
       - ./client:/app
       - /app/node_modules

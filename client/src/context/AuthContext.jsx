@@ -39,7 +39,14 @@ export const AuthProvider = ({ children }) => {
       credentials: 'include',
     });
 
-    const data = await res.json();
+    let data = {};
+    const text = await res.text();
+    try {
+      data = text ? JSON.parse(text) : {};
+    } catch (e) {
+      throw new Error(`Server returned ${res.status}: ${res.statusText || 'Invalid response from server'}`);
+    }
+
     if (!res.ok) {
       throw new Error(data.error || 'Authentication failed');
     }
