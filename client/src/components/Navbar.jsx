@@ -53,6 +53,17 @@ export const Navbar = ({ activeTab, setActiveTab }) => {
           {/* Navigation Links */}
           <nav className="hidden md:flex items-center gap-1">
             <button
+              onClick={() => setActiveTab('dashboard')}
+              className={`px-3 py-1.5 rounded-md text-sm font-medium transition ${
+                activeTab === 'dashboard'
+                  ? 'bg-emerald-600/20 text-emerald-400 border border-emerald-500/30'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-800'
+              }`}
+            >
+              {t('nav.dashboard')}
+            </button>
+
+            <button
               onClick={() => setActiveTab('equipment')}
               className={`px-3 py-1.5 rounded-md text-sm font-medium transition ${
                 activeTab === 'equipment'
@@ -106,6 +117,19 @@ export const Navbar = ({ activeTab, setActiveTab }) => {
             >
               {t('nav.parts_catalog')}
             </button>
+
+            {['admin', 'manager', 'technician'].includes(user?.role) && (
+              <button
+                onClick={() => setActiveTab('analytics')}
+                className={`px-3 py-1.5 rounded-md text-sm font-medium transition ${
+                  activeTab === 'analytics'
+                    ? 'bg-emerald-600/20 text-emerald-400 border border-emerald-500/30'
+                    : 'text-slate-300 hover:text-white hover:bg-slate-800'
+                }`}
+              >
+                {t('nav.analytics')}
+              </button>
+            )}
 
             {['admin', 'manager'].includes(user?.role) && (
               <button

@@ -17,13 +17,13 @@ The entire project is built directly to the specifications outlined in the Produ
 | **Phase 1** | **Foundation & Auth** | ✅ **Complete** | Open-source JWT/bcrypt auth, RBAC (5 roles), many-to-many operator equipment scoping (`operator_equipment`), plant locations, equipment CRUD, document uploads, bilingual English/Spanish `i18next` foundation. |
 | **Phase 2** | **Parts Requisitions & Catalog** | ✅ **Complete** | Spare parts inventory catalog with low-stock alerts, equipment BOM linking, parts requisition queue, server-side Sharp image compression (1920px WebP) for phone camera uploads, in-app approval workflow. |
 | **Phase 3** | **PM Core & Work Orders** | ✅ **Complete** | Dual-trigger PM scheduler (calendar days & runtime meter hours), automated due-PM detection & idempotent work order generator, full work order lifecycle (`Open` &rarr; `In Progress` &rarr; `Completed`), interactive checklist execution, downtime minutes & root-cause logging, real-time parts inventory auto-deduction, automatic recurrence rescheduling upon completion, supervisor sign-offs. |
-| **Phase 4** | **Dashboards & Reporting** | 🔄 **In Progress** | Real-time shop floor uptime wallboard (status grid grouped by plant area, 30s auto-refresh), live "recently down" equipment panel with stoppage timers, open parts requests counter, MTBF/MTTR analytics, and maintenance cost rollups. |
-| **Phase 5** | **Localization & Guided Help** | ⏳ *Scheduled* | Full Spanish coverage pass, contextual "How Do I..." in-app help panel per module, role-aware guided walkthroughs. |
+| **Phase 4** | **Dashboards & Reporting** | ✅ **Complete** | Real-time shop floor uptime wallboard (status grid grouped by plant area, 30s auto-refresh), live "recently down" equipment panel with stoppage timers, open parts requests aging queue, MTBF/MTTR analytics, and maintenance cost rollups. |
+| **Phase 5** | **Localization & Guided Help** | 🔄 **In Progress** | Full Spanish coverage pass, contextual "How Do I..." in-app help panel per module, role-aware guided walkthroughs. |
 | **Phase 6** | **Polish & Floor Utilities** | ⏳ *Scheduled* | Mobile QR code generation & camera scan-to-view, rapid quick-add equipment forms with duplicate serial detection, audit logging explorer. |
 
 ---
 
-## 🚀 Live Capabilities (Phases 1 – 3)
+## 🚀 Live Capabilities (Phases 1 – 4)
 
 ### 1. Equipment Registry & Operator Scoping
 - **Machine Hierarchy:** Structured by Building &rarr; Area &rarr; Specific Location (Cutting Bay, Tempering Furnace Line, Lamination Cleanroom, Edging Station).
@@ -43,6 +43,15 @@ The entire project is built directly to the specifications outlined in the Produ
 - **Inventory Auto-Deduction:** Consuming spare parts on a work order immediately decrements stock from the warehouse catalog and fires low-stock alerts if hitting reorder thresholds.
 - **Auto-Rescheduling:** Completing a PM work order automatically stamps `last_performed_date = CURRENT_DATE` and advances the schedule to the next due date and runtime meter threshold.
 - **Supervisor Sign-Off:** Restricted to Managers and Administrators for quality assurance.
+
+### 4. Shop Floor Uptime Wallboard & Maintenance Analytics (PRD 3.8 & 3.9)
+- **Live Plant Uptime Wallboard:** Designed for shop-floor monitor displays with 30-second auto-refresh, selectable time windows (Today, Last 7 Days, Last 30 Days), and live shop-wide availability % calculation.
+- **Machinery Status Grid:** Grouped by plant area (Cutting Area, Tempering Furnace, Lamination Line, Fabrication & Edging) with real-time status pulses (Active/Running, Down, In Storage) and runtime meters.
+- **Active Outages & Downtime Tracker:** Automatically surfaces currently offline machines with running downtime timers, failure reasons, and immediate click-through to work orders.
+- **Parts Requisition Aging Queue:** Ranks pending parts orders by urgency and elapsed age in hours and days so critical tooling orders never stall.
+- **Asset Reliability Analytics:** Computes MTBF (Mean Time Between Failures) and MTTR (Mean Time to Repair) per machine.
+- **Maintenance Cost Rollup:** Aggregates technician labor costs ($65/hr standard rate) and consumed parts spend per asset.
+- **Technician Productivity & Parts Consumption:** Tracks closed work orders and labor hours per technician, and highlights top consumed spare parts by total spend.
 
 ---
 
