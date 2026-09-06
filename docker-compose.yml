@@ -1,0 +1,64 @@
+services:
+  pm_db:
+    image: postgres:16-alpine
+    container_name: pm_portal_db
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${DB_USER:-pm_admin}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-pm_secure_pass_2026}
+      POSTGRES_DB: ${DB_NAME:-pm_portal}
+    volumes:
+      - pm_db_data:/var/lib/postgresql/data
+      - ./server/schema.sql:/docker-entrypoint-initdb.d/01_init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-pm_admin} -d ${DB_NAME:-pm_portal}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  pm_backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: pm_portal_backend
+    restart: unless-stopped
+    ports:
+      - "5050:5050"
+    environment:
+      PORT: 5050
+      DATABASE_URL: postgres://${DB_USER:-pm_admin}:${DB_PASSWORD:-pm_secure_pass_2026}@pm_db:5432/${DB_NAME:-pm_portal}
+      JWT_SECRET: ${JWT_SECRET:-pm_portal_super_secure_jwt_secret_2026}
+      NODE_ENV: ${NODE_ENV:-development}
+      UPLOAD_DIR: /data/documents
+      CLIENT_ORIGIN: ${CLIENT_ORIGIN:-http://localhost:3001}
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+      - pm_doc_storage:/data/documents
+    depends_on:
+      pm_db:
+        condition: service_healthy
+
+  pm_frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: pm_portal_frontend
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      VITE_API_URL: http://localhost:5050
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    depends_on:
+      - pm_backend
+
+volumes:
+  pm_db_data:
+    name: pm_portal_db_data
+  pm_doc_storage:
+    name: pm_portal_doc_storage
