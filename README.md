@@ -41,6 +41,46 @@ The entire project is built directly to the specifications outlined in the Produ
 
 ---
 
+## 📸 Visual Tour: System Modules & Live Interfaces
+
+### 1. Branded Portal Authentication & Demo Login
+Secure `httpOnly` cookie JWT authentication with one-click role selector chips for quick testing across all 5 permission levels.
+![CGI PM Portal Login](docs/screenshots/00-login.png)
+
+### 2. Shop Floor Status & Uptime Wallboard (PRD 3.8)
+Designed for plant-floor TV mounting with 30-second auto-refresh, live availability metrics, machinery status grid grouped by area (Cutting, Tempering, Lamination, Edging), active stoppage timers, and aging parts orders.
+![Shop Floor Uptime Wallboard](docs/screenshots/01-shop-wallboard.png)
+
+### 3. Plant Machinery & Equipment Registry (PRD 2.2)
+Complete asset hierarchy with operating meters, current statuses, plant location groupings, service documentation attachments, and strict operator-scoping filters.
+![Machinery Registry](docs/screenshots/02-machinery-registry.png)
+
+### 4. Work Orders Lifecycle Engine (PRD 3.4 & 3.5)
+Interactive task checklists, labor hour recording, stoppage downtime & root-cause tracking, parts inventory auto-deduction, and supervisor sign-offs.
+![Work Orders Engine](docs/screenshots/03-work-orders.png)
+
+### 5. Preventive Maintenance Schedules (PRD 3.1 – 3.3)
+Dual-trigger PM scheduling engine (calendar intervals and runtime-meter thresholds), automated due-PM detection with one-click scanning, and interactive dynamic checklist builder.
+![PM Schedules Builder](docs/screenshots/04-pm-schedules.png)
+
+### 6. Parts Requisition & Approval Queue (PRD 2.3)
+Floor operator request queue with urgency badges, manager approval/rejection/ordering workflow, and in-memory WebP compressed camera photo uploads.
+![Parts Requisitions Queue](docs/screenshots/05-parts-requests.png)
+
+### 7. Spare Parts Inventory Catalog (PRD 2.4 & 3.6)
+Plant spare parts inventory with category filtering, storage bin coordinates, real-time stock levels, and automatic low-stock threshold warnings.
+![Spare Parts Inventory Catalog](docs/screenshots/06-parts-catalog.png)
+
+### 8. Plant Maintenance Analytics & Reliability (PRD 3.9)
+Historical KPIs including on-time PM compliance rate %, MTBF (Mean Time Between Failures), MTTR (Mean Time to Repair), maintenance spend rollups ($65/hr labor + parts), and technician productivity leaderboards.
+![Plant Maintenance Analytics](docs/screenshots/07-plant-analytics.png)
+
+### 9. User Management & Operator Equipment Scoping (PRD 2.1)
+Role-based access control (RBAC) and many-to-many operator equipment scoping (`operator_equipment`) ensuring operators only see and interact with their assigned machinery.
+![User Management & Scoping](docs/screenshots/08-user-management.png)
+
+---
+
 ## 🚀 Live Capabilities (Phases 1 – 4)
 
 ### 1. Equipment Registry & Operator Scoping
