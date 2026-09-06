@@ -1,7 +1,7 @@
 {
   "nav": {
-    "brand": "Portal MP de CGI",
-    "tagline": "Mantenimiento Preventivo y Salud de Activos",
+    "brand": "Custom Glass Industries, Inc.",
+    "tagline": "Portal de Mantenimiento Preventivo • Planta Anaheim",
     "dashboard": "Mural de Planta",
     "analytics": "Análisis e Informes",
     "equipment": "Registro de Maquinaria",
@@ -12,6 +12,9 @@
     "parts_catalog": "Inventario de Repuestos",
     "users": "Gestión de Usuarios",
     "locations": "Ubicaciones de Planta",
+    "group_maintenance": "Mantenimiento",
+    "group_parts": "Repuestos y Suministros",
+    "group_management": "Administración",
     "logout": "Cerrar Sesión",
     "role_badge": "Rol"
   },
@@ -207,8 +210,8 @@
     "viewer": "Visualizador"
   },
   "auth": {
-    "title": "Portal de Mantenimiento Preventivo CGI",
-    "subtitle": "Sistema de Activos de la Planta de Vidrio Arquitectónico de Anaheim",
+    "title": "Custom Glass Industries, Inc.",
+    "subtitle": "Planta de Vidrio Arquitectónico de Anaheim • Portal de Mantenimiento Preventivo",
     "login_prompt": "Inicie sesión para acceder a equipos, programas de MP y registros",
     "login_field": "Usuario o Correo Electrónico",
     "password_field": "Contraseña",

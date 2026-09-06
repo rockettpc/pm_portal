@@ -228,7 +228,7 @@ export const PMSchedulesView = () => {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-slate-900 border border-slate-800 p-6 rounded-xl shadow-lg">
         <div>
           <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-emerald-600/20 text-emerald-400 rounded-lg border border-emerald-500/30">
+            <div className="p-2.5 bg-cyan-500/15 text-cyan-400 rounded-lg border border-cyan-500/30">
               <Calendar size={24} />
             </div>
             <div>
@@ -250,13 +250,13 @@ export const PMSchedulesView = () => {
                 disabled={scanning}
                 className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-3.5 py-2 rounded-lg text-sm font-medium transition"
               >
-                <RefreshCw size={16} className={scanning ? 'animate-spin text-emerald-400' : 'text-slate-400'} />
+                <RefreshCw size={16} className={scanning ? 'animate-spin text-cyan-400' : 'text-slate-400'} />
                 {scanning ? t('pm_schedules.scanning') : t('pm_schedules.check_due_btn')}
               </button>
 
               <button
                 onClick={() => setShowAddModal(true)}
-                className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-sm transition"
+                className="flex items-center gap-2 bg-cyan-600 hover:bg-cyan-500 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-md shadow-cyan-900/30 transition"
               >
                 <Plus size={16} />
                 {t('pm_schedules.new_schedule_btn')}
@@ -267,9 +267,9 @@ export const PMSchedulesView = () => {
       </div>
 
       {scanMessage && (
-        <div className="bg-emerald-950/40 border border-emerald-800/60 p-4 rounded-xl text-sm text-emerald-300 flex items-center justify-between">
+        <div className="bg-cyan-950/40 border border-cyan-800/60 p-4 rounded-xl text-sm text-cyan-300 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <CheckCircle2 size={16} className="text-emerald-400 shrink-0" />
+            <CheckCircle2 size={16} className="text-cyan-400 shrink-0" />
             <span>{scanMessage}</span>
           </div>
           <button onClick={() => setScanMessage('')} className="text-xs text-slate-400 hover:text-white underline">
@@ -281,7 +281,7 @@ export const PMSchedulesView = () => {
       {/* Schedules Table */}
       {loading ? (
         <div className="py-16 text-center text-slate-400 flex flex-col items-center">
-          <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin mb-3" />
+          <div className="w-8 h-8 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin mb-3" />
           {t('common.loading')}
         </div>
       ) : schedules.length === 0 ? (
@@ -311,7 +311,7 @@ export const PMSchedulesView = () => {
                   return (
                     <tr key={sch.id} className="hover:bg-slate-800/40 transition">
                       <td className="py-4 px-4">
-                        <div className="font-mono font-bold text-emerald-400 text-xs">{sch.schedule_code}</div>
+                        <div className="font-mono font-bold text-cyan-400 text-xs">{sch.schedule_code}</div>
                         <div className="text-xs text-slate-400 flex items-center gap-1 mt-0.5">
                           <CheckSquare size={12} /> {checklistLength} {t('pm_schedules.tasks_count')}
                         </div>
@@ -325,7 +325,7 @@ export const PMSchedulesView = () => {
                       <td className="py-4 px-4 text-xs">
                         {['calendar', 'both'].includes(sch.trigger_type) && sch.calendar_interval_days && (
                           <div className="flex items-center gap-1 text-slate-300">
-                            <Calendar size={12} className="text-emerald-400" />
+                            <Calendar size={12} className="text-cyan-400" />
                             <span>Every {sch.calendar_interval_days} days</span>
                           </div>
                         )}
@@ -356,7 +356,7 @@ export const PMSchedulesView = () => {
                           <button
                             onClick={() => handleTriggerNow(sch.id)}
                             title={t('pm_schedules.trigger_wo_btn')}
-                            className="inline-flex items-center gap-1 text-xs font-medium text-emerald-400 hover:text-emerald-300 bg-emerald-950/40 hover:bg-emerald-900/50 border border-emerald-800/60 px-2.5 py-1.5 rounded-lg transition"
+                            className="inline-flex items-center gap-1 text-xs font-medium text-cyan-400 hover:text-cyan-300 bg-cyan-950/40 hover:bg-cyan-900/50 border border-cyan-800/60 px-2.5 py-1.5 rounded-lg transition"
                           >
                             <Play size={12} />
                             {t('pm_schedules.trigger_wo_btn')}
@@ -378,7 +378,7 @@ export const PMSchedulesView = () => {
           <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full p-6 shadow-2xl my-8">
             <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-6">
               <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                <Calendar className="text-emerald-400" size={20} />
+                <Calendar className="text-cyan-400" size={20} />
                 {t('pm_schedules.modal_title')}
               </h2>
               <button
@@ -405,7 +405,7 @@ export const PMSchedulesView = () => {
                     value={newSchedule.equipment_id}
                     onChange={(e) => setNewSchedule({ ...newSchedule, equipment_id: e.target.value })}
                     required
-                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-emerald-500"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500"
                   >
                     <option value="">-- {t('parts_requests.select_machine')} --</option>
                     {equipmentList.map((eq) => (
@@ -423,7 +423,7 @@ export const PMSchedulesView = () => {
                   <select
                     value={newSchedule.assigned_to}
                     onChange={(e) => setNewSchedule({ ...newSchedule, assigned_to: e.target.value })}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-emerald-500"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500"
                   >
                     <option value="">-- Unassigned --</option>
                     {techList.map((tech) => (
@@ -445,7 +445,7 @@ export const PMSchedulesView = () => {
                   onChange={(e) => setNewSchedule({ ...newSchedule, title: e.target.value })}
                   placeholder="e.g. Weekly Cutting Head Inspection & Lubrication"
                   required
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-emerald-500"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500"
                 />
               </div>
 
@@ -458,7 +458,7 @@ export const PMSchedulesView = () => {
                   onChange={(e) => setNewSchedule({ ...newSchedule, description: e.target.value })}
                   rows={2}
                   placeholder="Provide scope, required tools, safety precautions..."
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-emerald-500"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500"
                 />
               </div>
 
@@ -470,7 +470,7 @@ export const PMSchedulesView = () => {
                   <select
                     value={newSchedule.trigger_type}
                     onChange={(e) => setNewSchedule({ ...newSchedule, trigger_type: e.target.value })}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-emerald-500"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500"
                   >
                     <option value="calendar">Calendar (Days)</option>
                     <option value="meter">Meter (Hours)</option>
@@ -488,7 +488,7 @@ export const PMSchedulesView = () => {
                       min="1"
                       value={newSchedule.calendar_interval_days}
                       onChange={(e) => setNewSchedule({ ...newSchedule, calendar_interval_days: e.target.value })}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-emerald-500"
+                      className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500"
                     />
                   </div>
                 )}
@@ -504,7 +504,7 @@ export const PMSchedulesView = () => {
                       step="10"
                       value={newSchedule.meter_interval_hours}
                       onChange={(e) => setNewSchedule({ ...newSchedule, meter_interval_hours: e.target.value })}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-emerald-500"
+                      className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500"
                     />
                   </div>
                 )}
@@ -516,7 +516,7 @@ export const PMSchedulesView = () => {
                   <select
                     value={newSchedule.priority}
                     onChange={(e) => setNewSchedule({ ...newSchedule, priority: e.target.value })}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-emerald-500"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500"
                   >
                     <option value="Critical">Critical</option>
                     <option value="High">High</option>
@@ -535,7 +535,7 @@ export const PMSchedulesView = () => {
                   <button
                     type="button"
                     onClick={handleAddChecklistTask}
-                    className="text-xs text-emerald-400 hover:text-emerald-300 font-semibold"
+                    className="text-xs text-cyan-400 hover:text-cyan-300 font-semibold"
                   >
                     {t('pm_schedules.add_task_btn')}
                   </button>
@@ -550,7 +550,7 @@ export const PMSchedulesView = () => {
                         value={item.task}
                         onChange={(e) => handleChecklistChange(index, e.target.value)}
                         placeholder={t('pm_schedules.task_placeholder')}
-                        className="flex-1 bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500"
+                        className="flex-1 bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-cyan-500"
                       />
                       {newSchedule.checklist.length > 1 && (
                         <button
@@ -577,7 +577,7 @@ export const PMSchedulesView = () => {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold px-5 py-2 rounded-lg transition"
+                  className="bg-cyan-600 hover:bg-cyan-500 text-white text-sm font-semibold px-5 py-2 rounded-lg shadow-md shadow-cyan-900/30 transition"
                 >
                   {saving ? t('common.loading') : t('common.save')}
                 </button>

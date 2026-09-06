@@ -144,9 +144,9 @@ export const UserManagementView = () => {
       case 'manager':
         return <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded bg-purple-950 text-purple-300 border border-purple-800"><Shield size={12} /> {t('roles.manager')}</span>;
       case 'technician':
-        return <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800"><Wrench size={12} /> {t('roles.technician')}</span>;
+        return <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800"><Wrench size={12} /> {t('roles.technician')}</span>;
       case 'operator':
-        return <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800"><HardHat size={12} /> {t('roles.operator')}</span>;
+        return <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded bg-amber-900/40 text-amber-300 border border-amber-700/50"><HardHat size={12} /> {t('roles.operator')}</span>;
       default:
         return <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700"><Eye size={12} /> {t('roles.viewer')}</span>;
     }
@@ -157,7 +157,7 @@ export const UserManagementView = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-2">
-            <Users size={24} className="text-emerald-400" />
+            <Users size={24} className="text-cyan-400" />
             {t('users.title')}
           </h1>
           <p className="text-xs sm:text-sm text-slate-400 mt-0.5">
@@ -168,7 +168,7 @@ export const UserManagementView = () => {
         {currentUser?.role === 'admin' && (
           <button
             onClick={() => setShowCreateModal(true)}
-            className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 py-2.5 rounded-lg shadow transition"
+            className="inline-flex items-center gap-2 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold px-4 py-2.5 rounded-lg shadow-md shadow-cyan-900/30 transition"
           >
             <UserPlus size={16} />
             {t('users.create_user')}
@@ -202,7 +202,7 @@ export const UserManagementView = () => {
                     <td className="px-4 py-3.5">{getRoleBadge(u.role)}</td>
                     <td className="px-4 py-3.5">
                       <span className="inline-flex items-center gap-1 font-mono uppercase bg-slate-950 px-2 py-0.5 rounded border border-slate-800 text-slate-300">
-                        <Globe size={11} className="text-emerald-400" />
+                        <Globe size={11} className="text-cyan-400" />
                         {u.language_preference}
                       </span>
                     </td>
@@ -225,7 +225,7 @@ export const UserManagementView = () => {
                               {u.assigned_equipment.map((eq) => (
                                 <span
                                   key={eq.id}
-                                  className="font-mono text-[10px] bg-emerald-950/80 text-emerald-300 border border-emerald-800 px-1.5 py-0.5 rounded"
+                                  className="font-mono text-[10px] bg-cyan-950/80 text-cyan-300 border border-cyan-800 px-1.5 py-0.5 rounded"
                                 >
                                   {eq.asset_id}
                                 </span>
@@ -243,7 +243,7 @@ export const UserManagementView = () => {
                       {u.role === 'operator' && (
                         <button
                           onClick={() => openAssignmentModal(u)}
-                          className="px-2.5 py-1 bg-emerald-950 hover:bg-emerald-900 text-emerald-300 border border-emerald-800 rounded text-[11px] font-medium transition"
+                          className="px-2.5 py-1 bg-cyan-950/60 hover:bg-cyan-900/60 text-cyan-300 border border-cyan-800/80 rounded text-[11px] font-medium transition"
                         >
                           {t('users.assign_machines')}
                         </button>
@@ -275,7 +275,7 @@ export const UserManagementView = () => {
           <div className="bg-slate-900 border border-slate-800 rounded-xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
             <div className="border-b border-slate-800 pb-3">
               <h3 className="text-base font-bold text-white flex items-center gap-2">
-                <HardHat size={18} className="text-emerald-400" />
+                <HardHat size={18} className="text-cyan-400" />
                 Assign Machines to {assigningUser.full_name}
               </h3>
               <p className="text-xs text-slate-400 mt-0.5">
@@ -294,7 +294,7 @@ export const UserManagementView = () => {
                   >
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-mono text-xs font-bold text-emerald-400 bg-emerald-950 px-1.5 py-0.5 rounded border border-emerald-800">
+                        <span className="font-mono text-xs font-bold text-cyan-400 bg-cyan-950 px-1.5 py-0.5 rounded border border-cyan-800">
                           {eq.asset_id}
                         </span>
                         <span className="text-xs font-semibold text-slate-200">{eq.name}</span>
@@ -304,7 +304,7 @@ export const UserManagementView = () => {
                       </div>
                     </div>
 
-                    <div className="text-emerald-400">
+                    <div className="text-cyan-400">
                       {isSelected ? <CheckSquare size={18} /> : <Square size={18} className="text-slate-600" />}
                     </div>
                   </div>
@@ -321,7 +321,7 @@ export const UserManagementView = () => {
               </button>
               <button
                 onClick={handleSaveAssignments}
-                className="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded text-xs font-semibold shadow"
+                className="px-4 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded text-xs font-semibold shadow-md shadow-cyan-900/30"
               >
                 {t('common.save')}
               </button>
@@ -336,7 +336,7 @@ export const UserManagementView = () => {
           <div className="bg-slate-900 border border-slate-800 rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <h3 className="text-base font-bold text-white flex items-center gap-2">
-                <UserPlus size={18} className="text-emerald-400" />
+                <UserPlus size={18} className="text-cyan-400" />
                 {t('users.create_user')}
               </h3>
               <button onClick={() => setShowCreateModal(false)} className="text-slate-400 hover:text-white">✕</button>
@@ -436,7 +436,7 @@ export const UserManagementView = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded font-medium"
+                  className="px-4 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded font-medium shadow-md shadow-cyan-900/30"
                 >
                   {t('common.save')}
                 </button>

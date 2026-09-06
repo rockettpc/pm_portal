@@ -334,7 +334,7 @@ export const WorkOrdersView = () => {
       {/* Top Banner */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-slate-900 border border-slate-800 p-6 rounded-xl shadow-lg">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 bg-emerald-600/20 text-emerald-400 rounded-lg border border-emerald-500/30">
+          <div className="p-2.5 bg-cyan-500/15 text-cyan-400 rounded-lg border border-cyan-500/30">
             <CheckSquare size={24} />
           </div>
           <div>
@@ -356,7 +356,7 @@ export const WorkOrdersView = () => {
                 onClick={() => setStatusFilter(f)}
                 className={`px-3 py-1.5 rounded-md transition ${
                   statusFilter === f
-                    ? 'bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 font-semibold'
+                    ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-semibold'
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
@@ -371,7 +371,7 @@ export const WorkOrdersView = () => {
           {canCreate && (
             <button
               onClick={() => setShowNewModal(true)}
-              className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-sm transition"
+              className="flex items-center gap-2 bg-cyan-600 hover:bg-cyan-500 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-md shadow-cyan-900/30 transition"
             >
               <Plus size={16} />
               {t('work_orders.new_wo_btn')}
@@ -383,38 +383,38 @@ export const WorkOrdersView = () => {
       {/* Work Orders Table */}
       {loading ? (
         <div className="py-16 text-center text-slate-400 flex flex-col items-center">
-          <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin mb-3" />
+          <div className="w-8 h-8 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin mb-3" />
           {t('common.loading')}
         </div>
       ) : filteredOrders.length === 0 ? (
         <div className="bg-slate-900 border border-slate-800 rounded-xl p-12 text-center text-slate-400">
-          <CheckSquare size={48} className="mx-auto mb-3 text-slate-600" />
-          <p className="text-base font-medium text-slate-300">{t('work_orders.no_wos')}</p>
+          <CheckSquare size={40} className="mx-auto mb-3 text-slate-600" />
+          <p className="font-semibold text-slate-300">{t('work_orders.no_orders')}</p>
+          <p className="text-xs text-slate-500 mt-1">{t('work_orders.no_orders_sub')}</p>
         </div>
       ) : (
-        <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-xl">
+        <div className="bg-slate-900 border border-slate-800 rounded-xl shadow-lg overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm text-slate-300">
-              <thead className="bg-slate-950/70 text-xs uppercase tracking-wider text-slate-400 border-b border-slate-800">
+              <thead className="bg-slate-950 text-slate-400 uppercase tracking-wider text-xs border-b border-slate-800">
                 <tr>
-                  <th className="py-3.5 px-4 font-semibold">{t('work_orders.wo_num')}</th>
-                  <th className="py-3.5 px-4 font-semibold">{t('work_orders.title')}</th>
-                  <th className="py-3.5 px-4 font-semibold">{t('work_orders.equipment')}</th>
-                  <th className="py-3.5 px-4 font-semibold">{t('work_orders.assigned_tech')}</th>
-                  <th className="py-3.5 px-4 font-semibold">{t('work_orders.priority')}</th>
-                  <th className="py-3.5 px-4 font-semibold">{t('work_orders.status')}</th>
-                  <th className="py-3.5 px-4 font-semibold">{t('work_orders.due_date')}</th>
-                  <th className="py-3.5 px-4 font-semibold text-right">{t('work_orders.actions')}</th>
+                  <th className="py-3.5 px-4 font-semibold">{t('work_orders.col_wo_num')}</th>
+                  <th className="py-3.5 px-4 font-semibold">{t('work_orders.col_title')}</th>
+                  <th className="py-3.5 px-4 font-semibold">{t('work_orders.col_asset')}</th>
+                  <th className="py-3.5 px-4 font-semibold">{t('work_orders.col_assignee')}</th>
+                  <th className="py-3.5 px-4 font-semibold">{t('work_orders.col_priority')}</th>
+                  <th className="py-3.5 px-4 font-semibold">{t('work_orders.col_status')}</th>
+                  <th className="py-3.5 px-4 font-semibold">{t('work_orders.col_due_date')}</th>
+                  <th className="py-3.5 px-4 text-right font-semibold">{t('work_orders.col_actions')}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800">
+              <tbody className="divide-y divide-slate-800/80">
                 {filteredOrders.map((wo) => {
                   const hasDowntime = parseInt(wo.downtime_minutes, 10) > 0;
                   return (
                     <tr key={wo.id} className="hover:bg-slate-800/40 transition">
-                      <td className="py-4 px-4">
-                        <div className="font-mono font-bold text-white text-xs">{wo.wo_number}</div>
-                        <div className="mt-1">{getTypeBadge(wo.type)}</div>
+                      <td className="py-4 px-4 font-mono font-bold text-white text-xs">
+                        {wo.wo_number}
                       </td>
                       <td className="py-4 px-4">
                         <div className="font-semibold text-white">{wo.title}</div>
@@ -425,14 +425,14 @@ export const WorkOrdersView = () => {
                             </span>
                           )}
                           {parseInt(wo.parts_used_count, 10) > 0 && (
-                            <span className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-400 bg-emerald-950/40 border border-emerald-800/50 px-1.5 py-0.5 rounded">
+                            <span className="inline-flex items-center gap-1 text-[11px] font-medium text-cyan-400 bg-cyan-950/40 border border-cyan-800/50 px-1.5 py-0.5 rounded">
                               <Wrench size={11} /> {wo.parts_used_count} parts (${parseFloat(wo.parts_cost_total).toFixed(2)})
                             </span>
                           )}
                         </div>
                       </td>
                       <td className="py-4 px-4">
-                        <div className="font-mono text-xs text-emerald-400">{wo.asset_id}</div>
+                        <div className="font-mono text-xs text-cyan-400">{wo.asset_id}</div>
                         <div className="text-xs text-slate-400">{wo.equipment_name}</div>
                       </td>
                       <td className="py-4 px-4 text-xs text-slate-300">
@@ -453,7 +453,7 @@ export const WorkOrdersView = () => {
                       <td className="py-4 px-4 text-right">
                         <button
                           onClick={() => openExecutionModal(wo)}
-                          className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-400 hover:text-emerald-300 bg-emerald-950/40 hover:bg-emerald-900/50 border border-emerald-800/60 px-3 py-1.5 rounded-lg transition"
+                          className="inline-flex items-center gap-1 text-xs font-semibold text-cyan-400 hover:text-cyan-300 bg-cyan-950/40 hover:bg-cyan-900/50 border border-cyan-800/60 px-3 py-1.5 rounded-lg transition"
                         >
                           {t('work_orders.view_execute')}
                           <ChevronRight size={14} />
@@ -475,7 +475,7 @@ export const WorkOrdersView = () => {
             <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-6">
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="font-mono font-bold text-emerald-400 text-sm">{selectedWo.wo_number}</span>
+                  <span className="font-mono font-bold text-cyan-400 text-sm">{selectedWo.wo_number}</span>
                   {getTypeBadge(selectedWo.type)}
                   {getPriorityBadge(selectedWo.priority)}
                   {getStatusBadge(execState.status)}
@@ -495,7 +495,7 @@ export const WorkOrdersView = () => {
 
             {loadingDetails ? (
               <div className="py-12 text-center text-slate-400">
-                <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+                <div className="w-8 h-8 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
                 {t('common.loading')}
               </div>
             ) : (
@@ -567,7 +567,7 @@ export const WorkOrdersView = () => {
                 {/* Checklist Execution */}
                 <div className="space-y-3">
                   <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                    <CheckSquare size={16} className="text-emerald-400" />
+                    <CheckSquare size={16} className="text-cyan-400" />
                     {t('work_orders.checklist_execution')}
                   </h3>
 
@@ -582,7 +582,7 @@ export const WorkOrdersView = () => {
                               type="checkbox"
                               checked={Boolean(item.completed)}
                               onChange={() => handleToggleChecklist(index)}
-                              className="mt-0.5 rounded border-slate-700 text-emerald-600 focus:ring-emerald-500"
+                              className="mt-0.5 rounded border-slate-700 text-cyan-600 focus:ring-cyan-500"
                             />
                             <div className="flex-1">
                               <span className={`text-xs font-medium ${item.completed ? 'line-through text-slate-500' : 'text-slate-200'}`}>
@@ -593,7 +593,7 @@ export const WorkOrdersView = () => {
                                 value={item.notes || ''}
                                 onChange={(e) => handleTaskNoteChange(index, e.target.value)}
                                 placeholder={t('work_orders.task_notes_placeholder')}
-                                className="mt-1.5 w-full bg-slate-900 border border-slate-800 rounded px-2.5 py-1 text-[11px] text-slate-300 focus:outline-none focus:border-emerald-500"
+                                className="mt-1.5 w-full bg-slate-900 border border-slate-800 rounded px-2.5 py-1 text-[11px] text-slate-300 focus:outline-none focus:border-cyan-500"
                               />
                             </div>
                           </label>
@@ -615,7 +615,7 @@ export const WorkOrdersView = () => {
                       min="0"
                       value={execState.actual_hours}
                       onChange={(e) => setExecState({ ...execState, actual_hours: e.target.value })}
-                      className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500"
+                      className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-cyan-500"
                     />
                   </div>
 
@@ -629,7 +629,7 @@ export const WorkOrdersView = () => {
                       min="0"
                       value={execState.downtime_minutes}
                       onChange={(e) => setExecState({ ...execState, downtime_minutes: e.target.value })}
-                      className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500"
+                      className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-cyan-500"
                     />
                   </div>
 
@@ -642,7 +642,7 @@ export const WorkOrdersView = () => {
                       value={execState.root_cause}
                       onChange={(e) => setExecState({ ...execState, root_cause: e.target.value })}
                       placeholder="e.g. Glass chips jammed vacuum cup exhaust line..."
-                      className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500"
+                      className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-cyan-500"
                     />
                   </div>
 
@@ -655,7 +655,7 @@ export const WorkOrdersView = () => {
                       value={execState.resolution_notes}
                       onChange={(e) => setExecState({ ...execState, resolution_notes: e.target.value })}
                       placeholder="Describe corrective actions taken, test lites run, and adjustments made..."
-                      className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500"
+                      className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-cyan-500"
                     />
                   </div>
                 </div>
@@ -663,7 +663,7 @@ export const WorkOrdersView = () => {
                 {/* Parts Consumed Section */}
                 <div className="space-y-3">
                   <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                    <Wrench size={16} className="text-emerald-400" />
+                    <Wrench size={16} className="text-cyan-400" />
                     {t('work_orders.parts_consumed_title')}
                   </h3>
 
@@ -684,11 +684,11 @@ export const WorkOrdersView = () => {
                         <tbody className="divide-y divide-slate-800">
                           {executionDetails.parts_used.map((pu) => (
                             <tr key={pu.id}>
-                              <td className="py-2 px-3 font-mono text-emerald-400">{pu.part_number}</td>
+                              <td className="py-2 px-3 font-mono text-cyan-400">{pu.part_number}</td>
                               <td className="py-2 px-3 text-white">{pu.part_name}</td>
                               <td className="py-2 px-3 font-bold">{pu.quantity}</td>
                               <td className="py-2 px-3">${parseFloat(pu.unit_cost).toFixed(2)}</td>
-                              <td className="py-2 px-3 font-semibold text-emerald-400">
+                              <td className="py-2 px-3 font-semibold text-cyan-400">
                                 ${(pu.quantity * parseFloat(pu.unit_cost)).toFixed(2)}
                               </td>
                               <td className="py-2 px-3 text-right">
@@ -715,7 +715,7 @@ export const WorkOrdersView = () => {
                       <select
                         value={selectedPartId}
                         onChange={(e) => setSelectedPartId(e.target.value)}
-                        className="flex-1 bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500"
+                        className="flex-1 bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-cyan-500"
                       >
                         <option value="">-- {t('work_orders.select_part')} --</option>
                         {catalogParts.map((p) => (
@@ -736,7 +736,7 @@ export const WorkOrdersView = () => {
                       <button
                         type="submit"
                         disabled={addingPart || !selectedPartId}
-                        className="bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-emerald-800/50 px-3 py-1.5 rounded-lg text-xs font-semibold transition"
+                        className="bg-slate-800 hover:bg-slate-700 text-cyan-400 border border-cyan-800/50 px-3 py-1.5 rounded-lg text-xs font-semibold transition"
                       >
                         {addingPart ? t('common.loading') : t('work_orders.add_part')}
                       </button>
@@ -757,7 +757,7 @@ export const WorkOrdersView = () => {
                     type="button"
                     onClick={() => handleSaveProgress()}
                     disabled={savingProgress}
-                    className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-5 py-2 rounded-lg transition"
+                    className="bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold px-5 py-2 rounded-lg shadow-md shadow-cyan-900/30 transition"
                   >
                     {savingProgress ? t('common.loading') : t('work_orders.save_progress')}
                   </button>
@@ -774,7 +774,7 @@ export const WorkOrdersView = () => {
           <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full p-6 shadow-2xl my-8">
             <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-6">
               <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                <Wrench className="text-emerald-400" size={20} />
+                <Wrench className="text-cyan-400" size={20} />
                 {t('work_orders.create_modal_title')}
               </h2>
               <button
@@ -801,7 +801,7 @@ export const WorkOrdersView = () => {
                     value={newWo.equipment_id}
                     onChange={(e) => setNewWo({ ...newWo, equipment_id: e.target.value })}
                     required
-                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-emerald-500"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500"
                   >
                     <option value="">-- {t('parts_requests.select_machine')} --</option>
                     {equipmentList.map((eq) => (
@@ -819,7 +819,7 @@ export const WorkOrdersView = () => {
                   <select
                     value={newWo.type}
                     onChange={(e) => setNewWo({ ...newWo, type: e.target.value })}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-emerald-500"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500"
                   >
                     <option value="Corrective">{t('work_orders.type_corrective')}</option>
                     <option value="Preventive">{t('work_orders.type_preventive')}</option>
@@ -839,7 +839,7 @@ export const WorkOrdersView = () => {
                   onChange={(e) => setNewWo({ ...newWo, title: e.target.value })}
                   placeholder="e.g. Cutting Table Carriage Guide Jammed"
                   required
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-emerald-500"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500"
                 />
               </div>
 
@@ -852,7 +852,7 @@ export const WorkOrdersView = () => {
                   onChange={(e) => setNewWo({ ...newWo, description: e.target.value })}
                   rows={2}
                   placeholder="Observed symptoms, error codes, production stoppage..."
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-emerald-500"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500"
                 />
               </div>
 
@@ -864,7 +864,7 @@ export const WorkOrdersView = () => {
                   <select
                     value={newWo.priority}
                     onChange={(e) => setNewWo({ ...newWo, priority: e.target.value })}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-emerald-500"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500"
                   >
                     <option value="Critical">Critical (Line Down)</option>
                     <option value="High">High</option>
@@ -880,7 +880,7 @@ export const WorkOrdersView = () => {
                   <select
                     value={newWo.assigned_to}
                     onChange={(e) => setNewWo({ ...newWo, assigned_to: e.target.value })}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-emerald-500"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500"
                   >
                     <option value="">-- Unassigned --</option>
                     {techList.map((t) => (
@@ -899,7 +899,7 @@ export const WorkOrdersView = () => {
                     type="date"
                     value={newWo.due_date}
                     onChange={(e) => setNewWo({ ...newWo, due_date: e.target.value })}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-emerald-500"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500"
                   />
                 </div>
               </div>
@@ -915,7 +915,7 @@ export const WorkOrdersView = () => {
                 <button
                   type="submit"
                   disabled={creating}
-                  className="bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold px-5 py-2 rounded-lg transition"
+                  className="bg-cyan-600 hover:bg-cyan-500 text-white text-sm font-semibold px-5 py-2 rounded-lg shadow-md shadow-cyan-900/30 transition"
                 >
                   {creating ? t('common.loading') : t('common.save')}
                 </button>

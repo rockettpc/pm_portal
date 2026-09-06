@@ -1,7 +1,7 @@
 {
   "nav": {
-    "brand": "CGI PM Portal",
-    "tagline": "Preventive Maintenance & Asset Health",
+    "brand": "Custom Glass Industries, Inc.",
+    "tagline": "Preventive Maintenance Portal • Anaheim Glass Plant",
     "dashboard": "Shop Wallboard",
     "analytics": "Analytics & Reports",
     "equipment": "Equipment Registry",
@@ -12,6 +12,9 @@
     "parts_catalog": "Parts Inventory",
     "users": "User Management",
     "locations": "Plant Locations",
+    "group_maintenance": "Maintenance",
+    "group_parts": "Parts & Supplies",
+    "group_management": "Management",
     "logout": "Sign Out",
     "role_badge": "Role"
   },
@@ -207,8 +210,8 @@
     "viewer": "Viewer"
   },
   "auth": {
-    "title": "CGI Preventive Maintenance Portal",
-    "subtitle": "Anaheim Architectural Glass Plant Asset System",
+    "title": "Custom Glass Industries, Inc.",
+    "subtitle": "Anaheim Architectural Glass Plant • Preventive Maintenance Portal",
     "login_prompt": "Sign in to access equipment, PM schedules, and service logs",
     "login_field": "Username or Email",
     "password_field": "Password",

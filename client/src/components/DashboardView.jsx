@@ -74,7 +74,7 @@ export const DashboardView = ({ setActiveTab }) => {
   if (loading && !data) {
     return (
       <div className="py-24 text-center text-slate-400 flex flex-col items-center">
-        <div className="w-10 h-10 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin mb-4" />
+        <div className="w-10 h-10 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin mb-4" />
         <p className="text-sm font-medium">{t('common.loading')}</p>
       </div>
     );
@@ -87,7 +87,7 @@ export const DashboardView = ({ setActiveTab }) => {
         <p className="text-sm font-semibold text-slate-200">Unable to load dashboard data</p>
         <button
           onClick={fetchOverview}
-          className="mt-3 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-emerald-400 border border-slate-700 rounded-lg transition"
+          className="mt-3 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-cyan-400 border border-slate-700 rounded-lg transition"
         >
           {t('dashboard.refresh_now')}
         </button>
@@ -103,7 +103,7 @@ export const DashboardView = ({ setActiveTab }) => {
       {/* Top Wallboard Header & Live Controls */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl">
         <div className="flex items-center gap-3.5">
-          <div className="p-3 bg-emerald-600/20 text-emerald-400 rounded-xl border border-emerald-500/30">
+          <div className="p-3 bg-cyan-500/15 text-cyan-400 rounded-xl border border-cyan-500/30">
             <Activity size={26} />
           </div>
           <div>
@@ -111,8 +111,8 @@ export const DashboardView = ({ setActiveTab }) => {
               <h1 className="text-xl font-bold text-white tracking-tight">
                 {t('dashboard.title')}
               </h1>
-              <span className="inline-flex items-center gap-1.5 bg-emerald-950 text-emerald-400 border border-emerald-800 text-[10px] font-mono uppercase px-2 py-0.5 rounded-full">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Live Wallboard
+              <span className="inline-flex items-center gap-1.5 bg-cyan-950/80 text-cyan-300 border border-cyan-800/60 text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-full font-semibold">
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" /> Live Wallboard
               </span>
             </div>
             <p className="text-xs text-slate-400 mt-0.5">
@@ -126,19 +126,19 @@ export const DashboardView = ({ setActiveTab }) => {
           <div className="bg-slate-950 p-1 rounded-lg border border-slate-800 flex items-center gap-1 text-xs">
             <button
               onClick={() => setDaysWindow(1)}
-              className={`px-3 py-1.5 rounded-md transition ${daysWindow === 1 ? 'bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 font-semibold' : 'text-slate-400 hover:text-white'}`}
+              className={`px-3 py-1.5 rounded-md transition ${daysWindow === 1 ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-semibold' : 'text-slate-400 hover:text-white'}`}
             >
               {t('dashboard.window_today')}
             </button>
             <button
               onClick={() => setDaysWindow(7)}
-              className={`px-3 py-1.5 rounded-md transition ${daysWindow === 7 ? 'bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 font-semibold' : 'text-slate-400 hover:text-white'}`}
+              className={`px-3 py-1.5 rounded-md transition ${daysWindow === 7 ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-semibold' : 'text-slate-400 hover:text-white'}`}
             >
               {t('dashboard.window_7d')}
             </button>
             <button
               onClick={() => setDaysWindow(30)}
-              className={`px-3 py-1.5 rounded-md transition ${daysWindow === 30 ? 'bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 font-semibold' : 'text-slate-400 hover:text-white'}`}
+              className={`px-3 py-1.5 rounded-md transition ${daysWindow === 30 ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-semibold' : 'text-slate-400 hover:text-white'}`}
             >
               {t('dashboard.window_30d')}
             </button>
@@ -149,7 +149,7 @@ export const DashboardView = ({ setActiveTab }) => {
               type="checkbox"
               checked={autoRefresh}
               onChange={(e) => setAutoRefresh(e.target.checked)}
-              className="rounded border-slate-700 text-emerald-600 focus:ring-emerald-500"
+              className="rounded border-slate-700 text-cyan-600 focus:ring-cyan-500"
             />
             {t('dashboard.auto_refresh_30s')}
           </label>
@@ -158,7 +158,7 @@ export const DashboardView = ({ setActiveTab }) => {
             onClick={fetchOverview}
             className="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-3 py-1.5 rounded-lg text-xs font-semibold transition"
           >
-            <RefreshCw size={13} className="text-emerald-400" />
+            <RefreshCw size={13} className="text-cyan-400" />
             {t('dashboard.refresh_now')}
           </button>
         </div>
@@ -304,7 +304,7 @@ export const DashboardView = ({ setActiveTab }) => {
                     </span>
                     <button
                       onClick={() => setActiveTab && setActiveTab('work-orders')}
-                      className="inline-flex items-center gap-1 text-emerald-400 hover:text-emerald-300 font-medium"
+                      className="inline-flex items-center gap-1 text-cyan-400 hover:text-cyan-300 font-medium"
                     >
                       View Work Orders <ArrowUpRight size={12} />
                     </button>
@@ -333,7 +333,7 @@ export const DashboardView = ({ setActiveTab }) => {
             <div key={areaName} className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-3">
               <div className="flex items-center justify-between pb-3 border-b border-slate-800">
                 <div className="flex items-center gap-2">
-                  <HardHat size={18} className="text-emerald-400" />
+                  <HardHat size={18} className="text-cyan-400" />
                   <h3 className="font-bold text-white text-sm tracking-wide uppercase">{areaName}</h3>
                 </div>
                 <span className="text-xs text-slate-400 font-mono">
@@ -355,7 +355,7 @@ export const DashboardView = ({ setActiveTab }) => {
                     >
                       <div>
                         <div className="flex items-center justify-between">
-                          <span className="font-mono text-xs font-bold text-emerald-400">{eq.asset_id}</span>
+                          <span className="font-mono text-xs font-bold text-cyan-400">{eq.asset_id}</span>
                           <div className="flex items-center gap-2">
                             <span className="text-xs font-mono font-semibold text-slate-300">
                               {eq.uptime_percentage}%
@@ -426,7 +426,7 @@ export const DashboardView = ({ setActiveTab }) => {
               <tbody className="divide-y divide-slate-800">
                 {open_parts_requests.map((pr) => (
                   <tr key={pr.id} className="hover:bg-slate-800/40 transition">
-                    <td className="py-2.5 px-3 font-mono font-bold text-emerald-400">{pr.request_number}</td>
+                    <td className="py-2.5 px-3 font-mono font-bold text-cyan-400">{pr.request_number}</td>
                     <td className="py-2.5 px-3 font-mono text-amber-300 font-semibold">{pr.age_label}</td>
                     <td className="py-2.5 px-3">
                       <span className="font-mono text-slate-200">{pr.asset_id}</span>

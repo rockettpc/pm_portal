@@ -216,7 +216,7 @@ export const PartsRequestsView = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-2">
-            <Package size={24} className="text-emerald-400" />
+            <Package size={24} className="text-cyan-400" />
             {user?.role === 'operator' ? t('parts_requests.operator_title') : t('parts_requests.title')}
           </h1>
           <p className="text-xs sm:text-sm text-slate-400 mt-0.5">
@@ -226,7 +226,7 @@ export const PartsRequestsView = () => {
 
         <button
           onClick={() => setShowNewModal(true)}
-          className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 py-2.5 rounded-lg shadow-md transition"
+          className="inline-flex items-center gap-2 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold px-4 py-2.5 rounded-lg shadow-md shadow-cyan-900/30 transition"
         >
           <Plus size={16} />
           {t('parts_requests.new_request_btn')}
@@ -280,7 +280,7 @@ export const PartsRequestsView = () => {
                   <span className="font-mono text-xs font-bold text-slate-200 bg-slate-950 px-2 py-0.5 rounded border border-slate-800">
                     {req.request_number}
                   </span>
-                  <span className="font-mono text-xs text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-800">
+                  <span className="font-mono text-xs text-cyan-400 bg-cyan-950/80 px-2 py-0.5 rounded border border-cyan-800">
                     {req.asset_id}
                   </span>
                   {getUrgencyBadge(req.urgency)}
@@ -290,7 +290,7 @@ export const PartsRequestsView = () => {
                 {/* Main description and machine */}
                 <div>
                   <h3 className="text-base font-bold text-white flex items-center gap-2">
-                    <span className="text-emerald-400 font-mono">[{req.quantity}x]</span>
+                    <span className="text-cyan-400 font-mono">[{req.quantity}x]</span>
                     {req.part_description}
                   </h3>
                   <p className="text-xs text-slate-400 mt-0.5">
@@ -328,7 +328,7 @@ export const PartsRequestsView = () => {
                         key={ph.id}
                         type="button"
                         onClick={() => setActivePhotoUrl(`/api/parts-requests/photos/${ph.id}`)}
-                        className="relative group rounded-lg overflow-hidden border border-slate-700 hover:border-emerald-500 transition"
+                        className="relative group rounded-lg overflow-hidden border border-slate-700 hover:border-cyan-500 transition"
                         title="View photo"
                       >
                         <img
@@ -369,7 +369,7 @@ export const PartsRequestsView = () => {
           <div className="bg-slate-900 border border-slate-800 rounded-xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <h3 className="text-base font-bold text-white flex items-center gap-2">
-                <Package size={18} className="text-emerald-400" />
+                <Package size={18} className="text-cyan-400" />
                 {t('parts_requests.modal_title')}
               </h3>
               <button onClick={() => setShowNewModal(false)} className="text-slate-400 hover:text-white">✕</button>
@@ -391,7 +391,7 @@ export const PartsRequestsView = () => {
                   required
                   value={formData.equipment_id}
                   onChange={(e) => setFormData({ ...formData, equipment_id: e.target.value })}
-                  className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-2 text-slate-200 focus:ring-1 focus:ring-emerald-500"
+                  className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-2 text-slate-200 focus:ring-1 focus:ring-cyan-500"
                 >
                   <option value="">-- Choose Machine --</option>
                   {equipmentList.map((eq) => (
@@ -401,7 +401,7 @@ export const PartsRequestsView = () => {
                   ))}
                 </select>
                 {user?.role === 'operator' && (
-                  <span className="text-[10px] text-emerald-400 mt-1 block">
+                  <span className="text-[10px] text-cyan-400 mt-1 block">
                     ✓ Scoped to your assigned machinery
                   </span>
                 )}
@@ -490,7 +490,7 @@ export const PartsRequestsView = () => {
               {/* Photo Upload with Phone Camera Support */}
               <div className="p-3 bg-slate-950/80 rounded-lg border border-slate-800 space-y-1">
                 <label className="block text-slate-300 font-semibold flex items-center gap-1.5">
-                  <Camera size={14} className="text-emerald-400" />
+                  <Camera size={14} className="text-cyan-400" />
                   {t('parts_requests.photo_label')}
                 </label>
                 <input
@@ -516,7 +516,7 @@ export const PartsRequestsView = () => {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded font-medium shadow disabled:opacity-50"
+                  className="px-4 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded font-medium shadow-md shadow-cyan-900/30 disabled:opacity-50"
                 >
                   {submitting ? t('parts_requests.submitting') : t('parts_requests.submit_btn')}
                 </button>
@@ -532,7 +532,7 @@ export const PartsRequestsView = () => {
           <div className="bg-slate-900 border border-slate-800 rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <div>
-                <span className="font-mono text-xs text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded border border-emerald-800">
+                <span className="font-mono text-xs text-cyan-400 bg-cyan-950 px-2 py-0.5 rounded border border-cyan-800">
                   {selectedRequest.request_number}
                 </span>
                 <h3 className="text-base font-bold text-white mt-1">

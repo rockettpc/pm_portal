@@ -1,6 +1,6 @@
-# CGI Preventive Maintenance (PM) Portal
+# Custom Glass Industries, Inc. — Preventive Maintenance (PM) Portal
 
-Plant asset registry, preventive maintenance scheduler, spare parts requisition, work order execution engine, and service documentation system designed specifically for the **CGI Glass Solutions** architectural glass fabrication plant in Anaheim, CA.
+Plant asset registry, preventive maintenance scheduler, spare parts requisition, work order execution engine, and service documentation system designed specifically for the **Custom Glass Industries, Inc.** architectural glass fabrication plant in Anaheim, CA.
 
 ---
 
@@ -18,8 +18,26 @@ The entire project is built directly to the specifications outlined in the Produ
 | **Phase 2** | **Parts Requisitions & Catalog** | ✅ **Complete** | Spare parts inventory catalog with low-stock alerts, equipment BOM linking, parts requisition queue, server-side Sharp image compression (1920px WebP) for phone camera uploads, in-app approval workflow. |
 | **Phase 3** | **PM Core & Work Orders** | ✅ **Complete** | Dual-trigger PM scheduler (calendar days & runtime meter hours), automated due-PM detection & idempotent work order generator, full work order lifecycle (`Open` &rarr; `In Progress` &rarr; `Completed`), interactive checklist execution, downtime minutes & root-cause logging, real-time parts inventory auto-deduction, automatic recurrence rescheduling upon completion, supervisor sign-offs. |
 | **Phase 4** | **Dashboards & Reporting** | ✅ **Complete** | Real-time shop floor uptime wallboard (status grid grouped by plant area, 30s auto-refresh), live "recently down" equipment panel with stoppage timers, open parts requests aging queue, MTBF/MTTR analytics, and maintenance cost rollups. |
+| **UI Polish** | **Brand Identity & Navigation Revamp** | ✅ **Complete** | Official **Custom Glass Industries, Inc.** brand asset integration, CGI Cyan (`#00b4f0`) & Oceanic Deep Blue theme, decluttered top navigation with dropdown groupings (**Maintenance**, **Parts & Supplies**, **Management**), and mobile drawer navigation. |
 | **Phase 5** | **Localization & Guided Help** | 🔄 **In Progress** | Full Spanish coverage pass, contextual "How Do I..." in-app help panel per module, role-aware guided walkthroughs. |
-| **Phase 6** | **Polish & Floor Utilities** | ⏳ *Scheduled* | Mobile QR code generation & camera scan-to-view, rapid quick-add equipment forms with duplicate serial detection, audit logging explorer. |
+| **Phase 6** | **Floor Utilities & Polish** | ⏳ *Scheduled* | Mobile QR code generation & camera scan-to-view, rapid quick-add equipment forms with duplicate serial detection, audit logging explorer. |
+
+---
+
+## 🎨 CGI Brand Identity & Decluttered Navigation Architecture
+
+- **Visual Brand Palette:** Re-skinned with Custom Glass Industries, Inc.'s official corporate colors:
+  - **CGI Cyan (`#00b4f0`):** Primary action buttons, active navigation markers, interactive filters, metric callouts, and glow accents.
+  - **Oceanic Blue (`#0078be`):** Gradient header undertones and secondary interactive states.
+  - **Architectural Glass Dark Slate (`#020617` / `#0f172a`):** High-contrast industrial shop-floor backdrop.
+  - **High-Visibility Industrial Safety Standards:** Operational status indicators strictly adhere to plant safety conventions (Active = `emerald-500`, Outage/Down = `red-500`, Warning/Urgent = `amber-500`).
+- **Streamlined Top Navigation (`Navbar.jsx`):**
+  - Eliminated the cluttered 8-tab horizontal layout that overflowed on smaller screens.
+  - **Direct Access:** Shop Wallboard (`Dashboard`) and Machinery Registry (`Equipment`).
+  - **Maintenance Dropdown:** Work Orders & PM Schedules.
+  - **Parts & Supplies Dropdown:** Requisitions Queue & Parts Catalog.
+  - **Management Dropdown:** Plant Analytics & Team / Operator Scoping (role-restricted).
+  - **Responsive Mobile Drawer:** Clean hamburger drawer providing quick touch access on floor tablets and mobile devices.
 
 ---
 

@@ -35,7 +35,7 @@ export const AnalyticsView = () => {
   if (loading && !data) {
     return (
       <div className="py-24 text-center text-slate-400 flex flex-col items-center">
-        <div className="w-10 h-10 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin mb-4" />
+        <div className="w-10 h-10 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin mb-4" />
         <p className="text-sm font-medium">{t('common.loading')}</p>
       </div>
     );
@@ -48,7 +48,7 @@ export const AnalyticsView = () => {
         <p className="text-sm font-semibold text-slate-200">Unable to load analytics data</p>
         <button
           onClick={fetchAnalytics}
-          className="mt-3 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-emerald-400 border border-slate-700 rounded-lg transition"
+          className="mt-3 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-cyan-400 border border-slate-700 rounded-lg transition"
         >
           Retry
         </button>
@@ -63,7 +63,7 @@ export const AnalyticsView = () => {
       {/* Header Banner */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl">
         <div className="flex items-center gap-3.5">
-          <div className="p-3 bg-emerald-600/20 text-emerald-400 rounded-xl border border-emerald-500/30">
+          <div className="p-3 bg-cyan-500/10 text-cyan-400 rounded-xl border border-cyan-500/20">
             <BarChart3 size={26} />
           </div>
           <div>
@@ -80,7 +80,7 @@ export const AnalyticsView = () => {
           onClick={fetchAnalytics}
           className="self-start md:self-auto bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-3.5 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-2"
         >
-          <TrendingUp size={14} className="text-emerald-400" /> Refresh Metrics
+          <TrendingUp size={14} className="text-cyan-400" /> Refresh Metrics
         </button>
       </div>
 
@@ -90,11 +90,11 @@ export const AnalyticsView = () => {
         <div className="bg-slate-900 border border-slate-800 p-5 rounded-xl shadow-lg flex flex-col justify-between md:col-span-2">
           <div className="flex items-center justify-between text-slate-400 text-xs font-medium">
             <span>{t('analytics.pm_compliance')}</span>
-            <Award size={18} className="text-emerald-400" />
+            <Award size={18} className="text-cyan-400" />
           </div>
           <div className="mt-4 flex items-end justify-between">
             <div>
-              <div className="text-4xl font-extrabold text-emerald-400 tracking-tight">
+              <div className="text-4xl font-extrabold text-cyan-400 tracking-tight">
                 {compliance?.pm_compliance_percentage}%
               </div>
               <div className="text-xs text-slate-400 mt-1">
@@ -104,7 +104,7 @@ export const AnalyticsView = () => {
 
             <div className="text-right space-y-1 text-xs">
               <div className="text-slate-300">
-                On-Time: <strong className="text-emerald-400">{compliance?.on_time_pm_wos}</strong>
+                On-Time: <strong className="text-cyan-400">{compliance?.on_time_pm_wos}</strong>
               </div>
               <div className="text-slate-300">
                 Total Closed: <strong>{compliance?.completed_pm_wos}</strong>
@@ -155,7 +155,7 @@ export const AnalyticsView = () => {
       <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
         <div className="flex items-center justify-between pb-3 border-b border-slate-800">
           <div className="flex items-center gap-2">
-            <Shield size={20} className="text-emerald-400" />
+            <Shield size={20} className="text-cyan-400" />
             <h2 className="text-sm font-bold text-white uppercase tracking-wider">
               {t('analytics.reliability_title')}
             </h2>
@@ -173,7 +173,7 @@ export const AnalyticsView = () => {
                 <th className="py-2.5 px-3">Operating Hours</th>
                 <th className="py-2.5 px-3">{t('analytics.failures_count')}</th>
                 <th className="py-2.5 px-3">{t('analytics.total_downtime')}</th>
-                <th className="py-2.5 px-3 text-emerald-400">{t('analytics.mtbf')}</th>
+                <th className="py-2.5 px-3 text-cyan-400">{t('analytics.mtbf')}</th>
                 <th className="py-2.5 px-3 text-blue-400">{t('analytics.mttr')}</th>
               </tr>
             </thead>
@@ -199,7 +199,7 @@ export const AnalyticsView = () => {
                       <span className="text-slate-500">0 mins</span>
                     )}
                   </td>
-                  <td className="py-3 px-3 font-mono font-bold text-emerald-400">
+                  <td className="py-3 px-3 font-mono font-bold text-cyan-400">
                     {r.mtbf_hours.toLocaleString()} hrs
                   </td>
                   <td className="py-3 px-3 font-mono font-bold text-blue-400">
@@ -246,7 +246,7 @@ export const AnalyticsView = () => {
                   <td className="py-3 px-3 font-semibold">{c.work_orders_count}</td>
                   <td className="py-3 px-3 font-mono">{c.labor_hours.toFixed(2)} hrs</td>
                   <td className="py-3 px-3 font-mono">${c.labor_cost.toFixed(2)}</td>
-                  <td className="py-3 px-3 font-mono text-emerald-400">${c.parts_spend.toFixed(2)}</td>
+                  <td className="py-3 px-3 font-mono text-cyan-400">${c.parts_spend.toFixed(2)}</td>
                   <td className="py-3 px-3 text-right font-mono font-bold text-white">
                     ${c.total_maintenance_cost.toFixed(2)}
                   </td>
@@ -278,7 +278,7 @@ export const AnalyticsView = () => {
                 <div className="flex items-center gap-4 text-right">
                   <div>
                     <div className="text-xs text-slate-400">Closed WOs</div>
-                    <div className="text-sm font-bold text-emerald-400">{tp.closed_count} / {tp.total_assigned}</div>
+                    <div className="text-sm font-bold text-cyan-400">{tp.closed_count} / {tp.total_assigned}</div>
                   </div>
                   <div>
                     <div className="text-xs text-slate-400">Hours Logged</div>
@@ -306,7 +306,7 @@ export const AnalyticsView = () => {
               {top_consumed_parts.map((part) => (
                 <div key={part.id} className="bg-slate-950 p-3.5 rounded-xl border border-slate-800 flex items-center justify-between">
                   <div>
-                    <div className="font-mono text-xs font-bold text-emerald-400">{part.part_number}</div>
+                    <div className="font-mono text-xs font-bold text-cyan-400">{part.part_number}</div>
                     <div className="text-xs font-semibold text-white mt-0.5">{part.name}</div>
                     <div className="text-[11px] text-slate-400">Stock remaining: {part.quantity_on_hand}</div>
                   </div>

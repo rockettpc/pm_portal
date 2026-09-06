@@ -226,17 +226,17 @@ export const EquipmentView = () => {
     <div className="space-y-6">
       {/* Operator Scoping Alert Notice */}
       {user?.role === 'operator' && (
-        <div className="bg-emerald-950/40 border border-emerald-700/60 rounded-xl p-4 flex items-center justify-between gap-4 text-emerald-200">
+        <div className="bg-cyan-950/40 border border-cyan-700/60 rounded-xl p-4 flex items-center justify-between gap-4 text-cyan-200">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-emerald-900/50 rounded-lg text-emerald-400">
+            <div className="p-2 bg-cyan-900/50 rounded-lg text-cyan-400">
               <ShieldAlert size={20} />
             </div>
             <div>
               <div className="font-semibold text-sm">{t('equipment.operator_title')}</div>
-              <div className="text-xs text-emerald-300/80">{t('equipment.operator_notice')}</div>
+              <div className="text-xs text-cyan-300/80">{t('equipment.operator_notice')}</div>
             </div>
           </div>
-          <span className="font-mono text-xs bg-emerald-900/80 text-emerald-300 px-2.5 py-1 rounded-md border border-emerald-600">
+          <span className="font-mono text-xs bg-cyan-900/80 text-cyan-300 px-2.5 py-1 rounded-md border border-cyan-600">
             {equipment.length} Machines Scoped
           </span>
         </div>
@@ -256,7 +256,7 @@ export const EquipmentView = () => {
         {['admin', 'manager'].includes(user?.role) && (
           <button
             onClick={() => setShowAddModal(true)}
-            className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 py-2.5 rounded-lg shadow-md transition"
+            className="inline-flex items-center gap-2 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold px-4 py-2.5 rounded-lg shadow-md shadow-cyan-900/30 transition"
           >
             <Plus size={16} />
             {t('equipment.add_asset')}
@@ -273,7 +273,7 @@ export const EquipmentView = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder={t('equipment.search_placeholder')}
-            className="w-full pl-9 pr-4 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+            className="w-full pl-9 pr-4 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-cyan-500"
           />
         </div>
 
@@ -282,7 +282,7 @@ export const EquipmentView = () => {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="bg-slate-950 border border-slate-800 text-slate-300 text-xs rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+            className="bg-slate-950 border border-slate-800 text-slate-300 text-xs rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-cyan-500"
           >
             <option value="ALL">All Statuses</option>
             <option value="Active">Active Only</option>
@@ -311,7 +311,7 @@ export const EquipmentView = () => {
                 <div className="flex items-start justify-between gap-3 mb-2.5">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="font-mono text-xs font-bold text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-800/80">
+                      <span className="font-mono text-xs font-bold text-cyan-400 bg-cyan-950/80 px-2 py-0.5 rounded border border-cyan-800/80">
                         {asset.asset_id}
                       </span>
                       <span className="text-slate-400 text-xs font-medium">
@@ -371,7 +371,7 @@ export const EquipmentView = () => {
                 </div>
                 <button
                   onClick={() => openAssetDetail(asset)}
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-400 hover:text-emerald-300 bg-emerald-950/50 hover:bg-emerald-900/50 border border-emerald-800/60 px-3 py-1.5 rounded-lg transition"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-cyan-400 hover:text-cyan-300 bg-cyan-950/50 hover:bg-cyan-900/50 border border-cyan-800/60 px-3 py-1.5 rounded-lg transition"
                 >
                   <Eye size={14} />
                   {t('equipment.details')} & {t('equipment.documents')}
@@ -390,7 +390,7 @@ export const EquipmentView = () => {
             <div className="flex items-start justify-between border-b border-slate-800 pb-4">
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="font-mono text-xs font-bold text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded border border-emerald-800">
+                  <span className="font-mono text-xs font-bold text-cyan-400 bg-cyan-950 px-2 py-0.5 rounded border border-cyan-800">
                     {selectedAsset.asset_id}
                   </span>
                   <span className="text-xs text-slate-400">{selectedAsset.category}</span>
@@ -451,13 +451,13 @@ export const EquipmentView = () => {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h4 className="text-sm font-bold text-white flex items-center gap-2">
-                  <FileText size={16} className="text-emerald-400" />
+                  <FileText size={16} className="text-cyan-400" />
                   Service Manuals & Schematics ({assetDocs.length})
                 </h4>
               </div>
 
               {uploadSuccess && (
-                <div className="p-2.5 bg-emerald-950/60 border border-emerald-800 rounded-lg text-xs text-emerald-300">
+                <div className="p-2.5 bg-cyan-950/60 border border-cyan-800 rounded-lg text-xs text-cyan-300">
                   {uploadSuccess}
                 </div>
               )}
@@ -472,7 +472,7 @@ export const EquipmentView = () => {
                       placeholder="Document title (e.g. Electrical Wiring Manual)"
                       value={docTitle}
                       onChange={(e) => setDocTitle(e.target.value)}
-                      className="text-xs bg-slate-900 border border-slate-800 rounded px-2.5 py-1.5 text-slate-200 sm:col-span-2 focus:ring-1 focus:ring-emerald-500"
+                      className="text-xs bg-slate-900 border border-slate-800 rounded px-2.5 py-1.5 text-slate-200 sm:col-span-2 focus:ring-1 focus:ring-cyan-500"
                     />
                     <select
                       value={docType}
@@ -495,7 +495,7 @@ export const EquipmentView = () => {
                     <button
                       type="submit"
                       disabled={uploading}
-                      className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-medium px-3 py-1.5 rounded transition flex items-center gap-1.5 disabled:opacity-50"
+                      className="bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-medium px-3 py-1.5 rounded transition flex items-center gap-1.5 disabled:opacity-50"
                     >
                       <Upload size={13} />
                       {uploading ? 'Uploading...' : t('common.upload')}
@@ -526,7 +526,7 @@ export const EquipmentView = () => {
                         href={`/api/documents/${doc.id}/download`}
                         target="_blank"
                         rel="noreferrer"
-                        className="p-1.5 text-emerald-400 hover:bg-emerald-950/50 rounded transition"
+                        className="p-1.5 text-cyan-400 hover:bg-cyan-950/50 rounded transition"
                         title="View / Download"
                       >
                         <Download size={16} />
@@ -555,7 +555,7 @@ export const EquipmentView = () => {
           <div className="bg-slate-900 border border-slate-800 rounded-xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <h3 className="text-base font-bold text-white flex items-center gap-2">
-                <Plus size={18} className="text-emerald-400" />
+                <Plus size={18} className="text-cyan-400" />
                 {t('equipment.add_asset')}
               </h3>
               <button onClick={() => setShowAddModal(false)} className="text-slate-400 hover:text-white">✕</button>
@@ -667,7 +667,7 @@ export const EquipmentView = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded font-medium"
+                  className="px-4 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded font-medium shadow-md shadow-cyan-900/30"
                 >
                   {t('common.save')}
                 </button>

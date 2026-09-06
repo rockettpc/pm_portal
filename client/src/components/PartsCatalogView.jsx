@@ -112,7 +112,7 @@ export const PartsCatalogView = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-2">
-            <Wrench size={24} className="text-emerald-400" />
+            <Wrench size={24} className="text-cyan-400" />
             {t('catalog.title')}
           </h1>
           <p className="text-xs sm:text-sm text-slate-400 mt-0.5">
@@ -123,7 +123,7 @@ export const PartsCatalogView = () => {
         {['admin', 'manager'].includes(user?.role) && (
           <button
             onClick={() => setShowAddModal(true)}
-            className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 py-2.5 rounded-lg shadow-md transition"
+            className="inline-flex items-center gap-2 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold px-4 py-2.5 rounded-lg shadow-md shadow-cyan-900/30 transition"
           >
             <Plus size={16} />
             {t('catalog.add_part_btn')}
@@ -140,7 +140,7 @@ export const PartsCatalogView = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search parts by number, description, or bin location..."
-            className="w-full pl-9 pr-4 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+            className="w-full pl-9 pr-4 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-cyan-500"
           />
         </div>
 
@@ -149,7 +149,7 @@ export const PartsCatalogView = () => {
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="bg-slate-950 border border-slate-800 text-slate-300 text-xs rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+            className="bg-slate-950 border border-slate-800 text-slate-300 text-xs rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-cyan-500"
           >
             {categories.map((cat) => (
               <option key={cat} value={cat}>{cat}</option>
@@ -184,7 +184,7 @@ export const PartsCatalogView = () => {
               <tbody className="divide-y divide-slate-800/60">
                 {filteredParts.map((p) => (
                   <tr key={p.id} className="hover:bg-slate-800/30 transition">
-                    <td className="px-4 py-3.5 font-mono font-bold text-emerald-400">
+                    <td className="px-4 py-3.5 font-mono font-bold text-cyan-400">
                       {p.part_number}
                     </td>
                     <td className="px-4 py-3.5">
@@ -241,7 +241,7 @@ export const PartsCatalogView = () => {
           <div className="bg-slate-900 border border-slate-800 rounded-xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <h3 className="text-base font-bold text-white flex items-center gap-2">
-                <Plus size={18} className="text-emerald-400" />
+                <Plus size={18} className="text-cyan-400" />
                 {t('catalog.add_part_btn')}
               </h3>
               <button onClick={() => setShowAddModal(false)} className="text-slate-400 hover:text-white">✕</button>
@@ -372,7 +372,7 @@ export const PartsCatalogView = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded font-medium shadow"
+                  className="px-4 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded font-medium shadow-md shadow-cyan-900/30"
                 >
                   {t('common.save')}
                 </button>
