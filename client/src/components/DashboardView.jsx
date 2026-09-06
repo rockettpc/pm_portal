@@ -80,7 +80,23 @@ export const DashboardView = ({ setActiveTab }) => {
     );
   }
 
-  const { summary, equipment_by_area, recently_down, open_parts_requests } = data || {};
+  if (!data) {
+    return (
+      <div className="py-24 text-center text-slate-400 flex flex-col items-center">
+        <AlertTriangle size={32} className="text-amber-400 mb-3" />
+        <p className="text-sm font-semibold text-slate-200">Unable to load dashboard data</p>
+        <button
+          onClick={fetchOverview}
+          className="mt-3 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-emerald-400 border border-slate-700 rounded-lg transition"
+        >
+          {t('dashboard.refresh_now')}
+        </button>
+      </div>
+    );
+  }
+
+  const { summary, equipment_by_area, recently_down, open_parts_requests } = data;
+  const recentlyDown = recently_down || [];
 
   return (
     <div className="space-y-6">

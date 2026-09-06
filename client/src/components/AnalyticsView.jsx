@@ -41,7 +41,22 @@ export const AnalyticsView = () => {
     );
   }
 
-  const { compliance, reliability, maintenance_costs, technician_productivity, top_consumed_parts } = data || {};
+  if (!data) {
+    return (
+      <div className="py-24 text-center text-slate-400 flex flex-col items-center">
+        <AlertTriangle size={32} className="text-amber-400 mb-3" />
+        <p className="text-sm font-semibold text-slate-200">Unable to load analytics data</p>
+        <button
+          onClick={fetchAnalytics}
+          className="mt-3 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-emerald-400 border border-slate-700 rounded-lg transition"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
+
+  const { compliance, reliability, maintenance_costs, technician_productivity, top_consumed_parts } = data;
 
   return (
     <div className="space-y-6">
