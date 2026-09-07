@@ -18,10 +18,12 @@ import {
   Shield,
   HardHat,
   Eye,
-  Wrench
+  Wrench,
+  HelpCircle,
+  FileText
 } from 'lucide-react';
 
-export const Navbar = ({ activeTab, setActiveTab }) => {
+export const Navbar = ({ activeTab, setActiveTab, onOpenHelp, onOpenQuickRef }) => {
   const { t, i18n } = useTranslation();
   const { user, logout, updateLanguage } = useAuth();
 
@@ -307,6 +309,16 @@ export const Navbar = ({ activeTab, setActiveTab }) => {
 
           {/* Right Action Bar: Language Toggle, User Profile, and Mobile Hamburger */}
           <div className="flex items-center gap-2 sm:gap-3">
+            {/* Contextual Help Panel Trigger */}
+            <button
+              onClick={onOpenHelp}
+              className="flex items-center gap-1.5 bg-cyan-950/60 hover:bg-cyan-900/80 text-cyan-300 hover:text-cyan-200 text-xs px-2.5 py-1.5 rounded-lg border border-cyan-800/60 hover:border-cyan-500/60 transition shadow-sm"
+              title={t('common.help')}
+            >
+              <HelpCircle size={14} className="text-cyan-400" />
+              <span className="font-semibold hidden sm:inline">{t('common.help')}</span>
+            </button>
+
             {/* Bilingual Switcher Pill */}
             <button
               onClick={toggleLanguage}
@@ -475,6 +487,30 @@ export const Navbar = ({ activeTab, setActiveTab }) => {
               )}
             </>
           )}
+
+          {/* Help & Quick-Ref in Mobile Menu */}
+          <div className="pt-2 border-t border-slate-800/80 mt-2 space-y-1">
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                if (onOpenHelp) onOpenHelp();
+              }}
+              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold text-cyan-300 hover:bg-cyan-950/40 border border-cyan-900/40 transition"
+            >
+              <HelpCircle size={16} className="text-cyan-400" />
+              <span>{t('common.help')}</span>
+            </button>
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                if (onOpenQuickRef) onOpenQuickRef();
+              }}
+              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold text-amber-300 hover:bg-amber-950/40 border border-amber-900/40 transition"
+            >
+              <FileText size={16} className="text-amber-400" />
+              <span>{t('quickref.modal_title')}</span>
+            </button>
+          </div>
         </div>
       )}
     </header>

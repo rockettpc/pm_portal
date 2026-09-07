@@ -8,3 +8,29 @@ body {
   background-color: #020617;
   color: #f8fafc;
 }
+
+@media print {
+  body {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  header, nav, .no-print, .floating-help-btn, .guided-tour-overlay {
+    display: none !important;
+  }
+
+  .printable-card {
+    position: static !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-shadow: none !important;
+    border: 1px solid #cbd5e1 !important;
+    padding: 1.5rem !important;
+    margin: 0 !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+    page-break-inside: avoid;
+  }
+}

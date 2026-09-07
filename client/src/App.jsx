@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { Navbar } from './components/Navbar';
 import { LoginView } from './components/LoginView';
@@ -10,6 +11,10 @@ import { PMSchedulesView } from './components/PMSchedulesView';
 import { PartsRequestsView } from './components/PartsRequestsView';
 import { PartsCatalogView } from './components/PartsCatalogView';
 import { UserManagementView } from './components/UserManagementView';
+import { HelpPanel } from './components/HelpPanel';
+import { GuidedTour } from './components/GuidedTour';
+import { QuickReferenceModal } from './components/QuickReferenceModal';
+import { HelpCircle, FileText } from 'lucide-react';
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -48,9 +53,13 @@ class ErrorBoundary extends React.Component {
 
 const MainLayout = () => {
   const { user, loading } = useAuth();
-  const [activeTab, setActiveTab] = useState(() => {
-    return 'dashboard';
-  });
+  const { t } = useTranslation();
+
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
+  const [isQuickRefOpen, setIsQuickRefOpen] = useState(false);
+  const [tourModule, setTourModule] = useState(null);
+  const [forceTour, setForceTour] = useState(false);
 
   React.useEffect(() => {
     if (user?.role === 'operator') {
@@ -73,9 +82,20 @@ const MainLayout = () => {
     return <LoginView />;
   }
 
+  const handleStartTour = (targetModule) => {
+    setTourModule(targetModule || activeTab);
+    setForceTour(true);
+  };
+
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
-      <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col relative">
+      <Navbar
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        onOpenHelp={() => setIsHelpOpen(true)}
+        onOpenQuickRef={() => setIsQuickRefOpen(true)}
+      />
+
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <ErrorBoundary>
           {activeTab === 'dashboard' && <DashboardView setActiveTab={setActiveTab} />}
@@ -88,6 +108,52 @@ const MainLayout = () => {
           {activeTab === 'users' && ['admin', 'manager'].includes(user?.role) && <UserManagementView />}
         </ErrorBoundary>
       </main>
+
+      {/* Floating Quick Action Bar (Shop Floor Accessible) */}
+      <div className="fixed bottom-5 right-5 z-30 flex items-center gap-2 no-print floating-help-btn">
+        <button
+          onClick={() => setIsQuickRefOpen(true)}
+          className="flex items-center gap-1.5 px-3 py-2 bg-slate-900/90 hover:bg-slate-800 text-amber-300 hover:text-amber-200 text-xs font-semibold rounded-full border border-slate-700/80 hover:border-amber-500/50 shadow-xl backdrop-blur-md transition group"
+          title={t('quickref.modal_title')}
+        >
+          <FileText size={15} className="text-amber-400 group-hover:scale-110 transition" />
+          <span className="hidden sm:inline font-mono">{t('common.quick_ref')}</span>
+        </button>
+
+        <button
+          onClick={() => setIsHelpOpen(true)}
+          className="flex items-center gap-2 px-3.5 py-2 bg-cyan-600 hover:bg-cyan-500 text-slate-950 text-xs font-bold rounded-full border border-cyan-400/80 shadow-2xl shadow-cyan-950/60 transition group"
+          title={t('common.help')}
+        >
+          <HelpCircle size={16} className="text-slate-950 group-hover:rotate-12 transition" />
+          <span>{t('common.help')}</span>
+        </button>
+      </div>
+
+      {/* In-App Contextual Help Slide-Over Panel */}
+      <HelpPanel
+        isOpen={isHelpOpen}
+        onClose={() => setIsHelpOpen(false)}
+        activeTab={activeTab}
+        onStartTour={handleStartTour}
+        onOpenQuickRef={() => setIsQuickRefOpen(true)}
+      />
+
+      {/* Interactive Guided Tour */}
+      <GuidedTour
+        activeTab={tourModule || activeTab}
+        forceOpen={forceTour}
+        onClose={() => {
+          setForceTour(false);
+          setTourModule(null);
+        }}
+      />
+
+      {/* Role-Specific Printable One-Page Quick-Reference Card */}
+      <QuickReferenceModal
+        isOpen={isQuickRefOpen}
+        onClose={() => setIsQuickRefOpen(false)}
+      />
     </div>
   );
 };

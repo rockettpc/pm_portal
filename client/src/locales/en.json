@@ -316,6 +316,788 @@
     "actions": "Actions",
     "confirm": "Confirm",
     "saving": "Saving...",
-    "deleting": "Deleting..."
+    "deleting": "Deleting...",
+    "help": "Help & Guides",
+    "quick_ref": "Quick-Ref Card",
+    "open_help": "Open Help",
+    "tour": "Guided Tour",
+    "restart_tour": "Restart Guided Tour",
+    "print": "Print",
+    "all": "All",
+    "step": "Step",
+    "of": "of"
+  },
+  "help": {
+    "panel_title": "Help & How-To Guides",
+    "panel_subtitle": "Task-oriented walkthroughs, procedures, and plant reference cards",
+    "select_module": "Select Module Guide:",
+    "your_role": "Your Current Role:",
+    "role_operator": "Operator: View your assigned machinery, log runtime hours, review work orders, and submit spare parts requisitions.",
+    "role_technician": "Technician: Execute work orders, complete checklist steps, log labor hours & downtime, auto-deduct parts from inventory, and order parts.",
+    "role_manager": "Manager/Admin: Supervise plant uptime, configure calendar/meter PM triggers, manage inventory thresholds, and assign equipment to operators.",
+    "role_viewer": "Viewer: Read-only access to equipment records, maintenance history, and parts catalog.",
+    "actions_heading": "Quick Learning Actions",
+    "tour_button": "Interactive Walkthrough",
+    "tour_button_sub": "Guided spotlight of key buttons & features on this screen",
+    "quickref_button": "Print Role Quick-Ref Card",
+    "quickref_button_sub": "One-page printable cheat sheet for shop floor or workstation",
+    "tasks_heading": "How Do I... (Task Procedures)",
+    "step_label": "Step",
+    "tip_label": "Pro Tip:",
+    "all_roles_badge": "All Roles",
+    "operator_badge": "Operator",
+    "technician_badge": "Technician",
+    "manager_badge": "Manager / Admin",
+    "modules": {
+      "dashboard": {
+        "name": "Shop Wallboard",
+        "summary": "The central shop-floor command center. Monitors real-time machine uptime, current equipment outages, open maintenance work orders, and aging parts requisitions.",
+        "tasks": [
+          {
+            "title": "How to monitor shop uptime and machine status",
+            "target_roles": [
+              "all"
+            ],
+            "steps": [
+              "Check the top KPI banner for current plant uptime percentage and total active vs down machines.",
+              "Review the machinery grid to see color-coded status badges: Green (Active), Red (Down), Yellow (In Storage), or Slate (Retired).",
+              "Use the auto-refresh toggle (30s) or click 'Refresh Grid' anytime to load the latest machine states.",
+              "Toggle time windows (Today, Last 7 Days, Last 30 Days) to analyze uptime trends."
+            ],
+            "tip": "Keep this screen visible on wallboards and tablet stands near the production lines for instant shift visibility."
+          },
+          {
+            "title": "How to respond to an active machine outage",
+            "target_roles": [
+              "technician",
+              "manager",
+              "admin"
+            ],
+            "steps": [
+              "Locate the machine in the 'Active Equipment Outages & Downtime' panel on the left.",
+              "Observe the live running timer showing exactly how long the machine has been down.",
+              "Click 'View Machine' to open the equipment details and review OEM manuals, or go to Work Orders to create a corrective repair ticket."
+            ],
+            "tip": "Recording accurate failure reasons during work order execution directly feeds the plant's MTBF/MTTR reliability reports."
+          },
+          {
+            "title": "How to monitor aging parts requisitions",
+            "target_roles": [
+              "technician",
+              "manager",
+              "admin"
+            ],
+            "steps": [
+              "Inspect the 'Open Parts Requisitions Aging Queue' panel on the right.",
+              "Look for items tagged with red 'URGENT' badges indicating machinery is impaired or halted.",
+              "Click 'Review Requisition' on any card to update its purchasing status or add supervisor notes."
+            ],
+            "tip": "Parts requested with 'Urgent' status automatically trigger priority webhook notifications."
+          }
+        ]
+      },
+      "equipment": {
+        "name": "Equipment Registry",
+        "summary": "Master directory of plant machinery, parent/child relationships, runtime operating hours, criticalities, and digital OEM service manuals.",
+        "tasks": [
+          {
+            "title": "How to find your assigned machines (Operators)",
+            "target_roles": [
+              "operator"
+            ],
+            "steps": [
+              "Your view is automatically filtered to show only the machines assigned to your shift by plant supervisors.",
+              "Review machine status, category, asset tag, and serial number on each machine card.",
+              "Use the search bar at the top to filter by machine name or asset ID (e.g., 'CNC-01' or 'Bystronic')."
+            ],
+            "tip": "If a machine is missing from your screen, ask your Maintenance Supervisor to assign it in User Management."
+          },
+          {
+            "title": "How to view and download equipment manuals",
+            "target_roles": [
+              "all"
+            ],
+            "steps": [
+              "Click 'Documents & Manuals' on any equipment card to open the document drawer.",
+              "Click 'View / Download' to open the OEM service manual, electrical schematic, or parts diagram in a new tab.",
+              "Supervisors can click 'Upload Manual' to attach newly released PDF documentation directly to the asset."
+            ],
+            "tip": "Manuals are stored securely on the server and are accessible from any tablet on the plant Wi-Fi."
+          },
+          {
+            "title": "How to add a new piece of equipment (Admins/Managers)",
+            "target_roles": [
+              "manager",
+              "admin"
+            ],
+            "steps": [
+              "Click '+ Add Equipment' in the top right corner of the screen.",
+              "Enter the Asset Tag (must be unique, e.g. 'CUT-01'), machine name, category, serial number, and vendor.",
+              "Set the location (Building and Department Area), operating hours, criticality rating, and initial operational status.",
+              "Click 'Save Equipment' to register the machine and generate its system record."
+            ],
+            "tip": "The system automatically prevents duplicate Asset Tags and Serial Numbers to preserve database integrity."
+          }
+        ]
+      },
+      "work_orders": {
+        "name": "Work Orders",
+        "summary": "The maintenance execution workspace. Technicians follow interactive checklist steps, log actual labor hours, record downtime minutes, and auto-deduct consumed parts from inventory.",
+        "tasks": [
+          {
+            "title": "How to execute a work order and complete checklists",
+            "target_roles": [
+              "technician",
+              "manager",
+              "admin"
+            ],
+            "steps": [
+              "Click 'Open / Execute' on any work order card to launch the Execution Modal.",
+              "Review work order type (Preventive, Corrective Repair, Inspection) and due date.",
+              "Check off checklist tasks as you perform them and add measurement notes in the field provided.",
+              "Click 'Save Progress' anytime to record partial work without closing the ticket."
+            ],
+            "tip": "Saving progress lets multiple shifts collaborate on complex repairs without losing checklist history."
+          },
+          {
+            "title": "How to record consumed parts with automatic stock deduction",
+            "target_roles": [
+              "technician",
+              "manager",
+              "admin"
+            ],
+            "steps": [
+              "Scroll down to 'Parts Consumed & Inventory Deduction' inside the Execution Modal.",
+              "Select the replacement part from the catalog dropdown and specify the quantity used.",
+              "Click '+ Add Used Part'. The system instantly checks current stock and deducts the quantity from the parts inventory table.",
+              "Unit costs and total parts spend roll up automatically to the asset's total maintenance cost."
+            ],
+            "tip": "If an admin later deletes a work order, the consumed parts are automatically refunded back into inventory stock."
+          },
+          {
+            "title": "How to close and sign off a completed work order",
+            "target_roles": [
+              "technician",
+              "manager",
+              "admin"
+            ],
+            "steps": [
+              "Enter total actual labor hours logged and total machine downtime minutes.",
+              "Select or enter the failure root cause and provide corrective resolution notes.",
+              "For supervisor sign-off, enter the supervisor's name and click 'Approve & Sign Off'.",
+              "Click 'Complete Work Order' to transition status to Closed and record completion timestamp."
+            ],
+            "tip": "Completed PM work orders automatically reset the next due date and meter threshold on the parent PM schedule."
+          }
+        ]
+      },
+      "pm_schedules": {
+        "name": "PM Schedules",
+        "summary": "The automated preventive maintenance engine. Defines maintenance cycles based on calendar intervals (days), runtime operating meters (hours), or whichever comes first.",
+        "tasks": [
+          {
+            "title": "How calendar and runtime meter triggers work",
+            "target_roles": [
+              "manager",
+              "admin",
+              "technician"
+            ],
+            "steps": [
+              "When creating or editing a schedule, choose 'Trigger Method': Calendar (e.g. 30 days), Meter (e.g. 250 operating hours), or Whichever Comes First.",
+              "Calendar triggers compare the current date against 'Next Due Date'.",
+              "Meter triggers compare the machine's current operating hours against the 'Next Due Meter' threshold.",
+              "When either threshold is reached, the schedule's status turns yellow ('DUE SOON') or red ('OVERDUE')."
+            ],
+            "tip": "Use 'Whichever Comes First' for high-production cutting and edging lines that run double shifts."
+          },
+          {
+            "title": "How to scan due PMs and auto-generate work orders",
+            "target_roles": [
+              "manager",
+              "admin",
+              "technician"
+            ],
+            "steps": [
+              "Click 'Scan Due PMs & Auto-Generate WOs' in the top action bar.",
+              "The backend scans all configured PM schedules against current calendar dates and machine meters.",
+              "Any schedule currently due or overdue automatically generates a new open Work Order with pre-populated checklist items and estimated labor hours.",
+              "To force a work order immediately for an individual schedule, click the lightning bolt 'Generate WO Now' icon."
+            ],
+            "tip": "The auto-scan can be run every morning at shift start to queue up the day's preventive maintenance jobs."
+          },
+          {
+            "title": "How to configure custom maintenance checklists",
+            "target_roles": [
+              "manager",
+              "admin"
+            ],
+            "steps": [
+              "In the Create or Edit PM Schedule modal, scroll to 'Maintenance Checklist Items'.",
+              "Click '+ Add Checklist Step' to add items (e.g., 'Check water filtration pressure', 'Grease linear guide bearings').",
+              "Use the trash icon to remove unnecessary steps.",
+              "Checklist steps are automatically embedded into every work order generated by this schedule."
+            ],
+            "tip": "Specific, numbered checklist steps ensure consistent preventative maintenance across all technician shifts."
+          }
+        ]
+      },
+      "parts_requests": {
+        "name": "Parts Requests",
+        "summary": "Shop floor requisition queue for replacement parts, tooling, and consumables. Features direct mobile photo capture with server-side compression and urgency alerts.",
+        "tasks": [
+          {
+            "title": "How to submit a replacement part request with photos",
+            "target_roles": [
+              "all"
+            ],
+            "steps": [
+              "Click '+ Request Part' in the top right corner of the screen.",
+              "Select the machine that requires the part from the dropdown.",
+              "Select an existing item from the Parts Catalog, or type a custom part description if it is not cataloged.",
+              "Enter quantity needed and describe the symptoms or reason (e.g. 'Cracked vacuum pad leaking air').",
+              "Click 'Attach Photo' to capture a live photo with your mobile camera or upload an image file.",
+              "Select Urgency: Low (Preventive/Future), Normal (Standard Restock), or Urgent (Machine Impaired/Down).",
+              "Click 'Submit Requisition' to save and alert maintenance supervisors."
+            ],
+            "tip": "Attaching a photo speeds up supervisor approvals significantly by verifying exact part geometry and wear."
+          },
+          {
+            "title": "Why urgency levels matter",
+            "target_roles": [
+              "all"
+            ],
+            "steps": [
+              "Urgent: Machine is actively down or unable to hold tolerance. Requests are flagged with bright red tags and prioritized at the top of the queue.",
+              "Normal: Machine is running but part is worn or near end of life. Standard restock lead time applies.",
+              "Low: Scheduled consumable restocking or spare backup for future maintenance."
+            ],
+            "tip": "Only select 'Urgent' if production is actively interrupted or immediate breakdown is imminent."
+          },
+          {
+            "title": "How supervisors review and approve requisitions",
+            "target_roles": [
+              "manager",
+              "admin"
+            ],
+            "steps": [
+              "Click 'Review / Status' on any requisition card.",
+              "Review requester name, timestamp, failure symptoms, and high-resolution compressed photo.",
+              "Update the status: 'Approved', 'Ordered', 'Received', or 'Rejected'.",
+              "Add supervisor notes to notify the requester (e.g., 'PO #4920 placed with CR Laurence, ETA Wednesday').",
+              "Click 'Save Decision' to update the ticket and record an audit log entry."
+            ],
+            "tip": "Approved parts can be quickly cross-referenced against storage bins in the Parts Inventory module."
+          }
+        ]
+      },
+      "parts_catalog": {
+        "name": "Parts Inventory",
+        "summary": "Plant spare parts and tooling catalog. Tracks stock levels, storage bin locations, unit costs, preferred suppliers, and reorder minimums.",
+        "tasks": [
+          {
+            "title": "How to locate parts by storage bin and part number",
+            "target_roles": [
+              "all"
+            ],
+            "steps": [
+              "Use the search box to filter by part number (e.g., 'WH-01'), part name, or category.",
+              "Inspect the 'Storage Bin' column to find the physical bin location in the maintenance parts room (e.g., 'Bin A-12' or 'Cabinet 3').",
+              "Check the 'In Stock' column to verify current on-hand availability before starting a repair."
+            ],
+            "tip": "Always check bin locations before requesting parts to avoid ordering items already in the tool room."
+          },
+          {
+            "title": "How min/max thresholds and low-stock alerts work",
+            "target_roles": [
+              "technician",
+              "manager",
+              "admin"
+            ],
+            "steps": [
+              "Every catalog item has a 'Min / Reorder' threshold set by management.",
+              "When current stock drops below or equal to the minimum, the row is flagged with a red 'LOW STOCK' badge.",
+              "Items with low stock appear on supervisor replenishment summaries to trigger purchase orders before stockouts occur."
+            ],
+            "tip": "Consuming parts on work orders immediately recalculates stock levels against min thresholds."
+          },
+          {
+            "title": "How to add or edit catalog items (Admins/Managers)",
+            "target_roles": [
+              "manager",
+              "admin"
+            ],
+            "steps": [
+              "Click '+ Add Catalog Item' to register a new part.",
+              "Provide unique Part Number, descriptive Name, Category, initial On-Hand Stock, Min Reorder Level, and Storage Bin.",
+              "Enter Unit Cost ($) and Preferred Supplier to ensure accurate cost rollups on maintenance work orders.",
+              "Click 'Save Part' to add it to the active catalog."
+            ],
+            "tip": "Unit costs are multiplied by consumed quantity on work orders to calculate total maintenance repair costs."
+          }
+        ]
+      },
+      "analytics": {
+        "name": "Analytics & Reports",
+        "summary": "Executive reliability and cost intelligence. Tracks PM compliance rate (>95% target), MTBF, MTTR, technician labor hours, and maintenance cost rollups per machine.",
+        "tasks": [
+          {
+            "title": "How to interpret MTBF and MTTR metrics",
+            "target_roles": [
+              "manager",
+              "admin",
+              "technician"
+            ],
+            "steps": [
+              "MTBF (Mean Time Between Failures): Average operating hours between breakdowns. Higher numbers indicate higher machine reliability.",
+              "MTTR (Mean Time to Repair): Average hours required to diagnose and resolve an outage. Lower numbers indicate faster maintenance response.",
+              "Review the 'Asset Reliability Metrics' table to identify chronic problem machines with high breakdown counts."
+            ],
+            "tip": "Machines with low MTBF and high MTTR should be targeted for increased preventive maintenance or vendor overhaul."
+          },
+          {
+            "title": "How PM compliance rate is calculated",
+            "target_roles": [
+              "manager",
+              "admin"
+            ],
+            "steps": [
+              "The top left gauge shows the plant's overall PM Compliance Rate percentage.",
+              "Formula: (PMs Completed On or Before Due Date / Total Due PMs) × 100.",
+              "Green indicators indicate meeting or exceeding the plant target (>95%). Yellow and red indicate overdue maintenance backlogs."
+            ],
+            "tip": "Consistently maintaining >95% PM compliance is proven to reduce unscheduled breakdown downtime by over 40%."
+          },
+          {
+            "title": "How maintenance costs roll up per asset",
+            "target_roles": [
+              "manager",
+              "admin"
+            ],
+            "steps": [
+              "Inspect the 'Maintenance Cost by Asset' table.",
+              "Labor Cost is calculated automatically from actual labor hours logged on work orders at the plant labor rate ($65/hr).",
+              "Parts Spend is calculated from actual catalog unit costs multiplied by consumed quantities.",
+              "Total Spend rolls up both labor and parts to help management make data-driven repair-vs-replace decisions."
+            ],
+            "tip": "Compare an asset's total yearly maintenance spend against replacement capital cost to justify equipment upgrades."
+          }
+        ]
+      },
+      "users": {
+        "name": "User Management",
+        "summary": "Plant role-based access control (RBAC) and operator machine scoping. Controls permissions and scopes operators to their assigned shift equipment.",
+        "tasks": [
+          {
+            "title": "How operator machine scoping works",
+            "target_roles": [
+              "manager",
+              "admin"
+            ],
+            "steps": [
+              "Operators have scoped access enforced directly at the API layer for plant safety and simplicity.",
+              "When an operator logs in, they only see machines assigned to them, and can only submit parts requests for those specific assets.",
+              "Managers, Admins, and Technicians retain plant-wide visibility across all machinery."
+            ],
+            "tip": "Scoped views prevent operators from accidentally requesting parts or reporting status on machinery outside their department."
+          },
+          {
+            "title": "How to assign machines to an operator",
+            "target_roles": [
+              "manager",
+              "admin"
+            ],
+            "steps": [
+              "Find the operator in the User Directory table.",
+              "Click the 'Assign Machines' button in their row.",
+              "In the multi-select modal, check all machines the operator is qualified to run on their shift.",
+              "Click 'Save Assignments' to persist the permissions to the database immediately."
+            ],
+            "tip": "The operator's screen updates immediately upon their next action or page refresh."
+          },
+          {
+            "title": "How to reset passwords and manage roles",
+            "target_roles": [
+              "admin"
+            ],
+            "steps": [
+              "Click the key icon 'Reset Password' to set a new password for any user who forgot their credentials.",
+              "Click the pencil icon 'Edit User' to update full name, email, default language preference, or system role.",
+              "Admins cannot delete their own account, preventing accidental lockouts."
+            ],
+            "tip": "Language preference set on a user profile loads automatically whenever that user logs into any plant device."
+          }
+        ]
+      }
+    }
+  },
+  "tour": {
+    "step_counter": "Step {{current}} of {{total}}",
+    "skip": "Skip Tour",
+    "back": "Back",
+    "next": "Next",
+    "finish": "Got It / Finish",
+    "dont_show_again": "Don't show this tour on first visit",
+    "modules": {
+      "dashboard": [
+        {
+          "title": "Plant Uptime & KPIs",
+          "description": "The top status bar tracks live plant uptime %, total operational machinery count, active breakdown outages, and open work orders across the Anaheim facility."
+        },
+        {
+          "title": "Active Equipment Outages",
+          "description": "The left panel logs all currently down machinery in real time with running outage stopwatches and failure reasons to accelerate response."
+        },
+        {
+          "title": "Parts Requisition Queue",
+          "description": "The right panel tracks aging parts requests awaiting review or delivery, highlighting urgent breakdown requisitions in red."
+        },
+        {
+          "title": "Auto-Refresh & Time Windows",
+          "description": "Toggle auto-refresh (30s) for live wallboard displays, or switch time windows between Today, Last 7 Days, and Last 30 Days to analyze operational trends."
+        }
+      ],
+      "equipment": [
+        {
+          "title": "Machinery Registry",
+          "description": "Browse all plant machines with their unique asset tags, locations, serial numbers, operating hours, and operational status."
+        },
+        {
+          "title": "Operator Scoping",
+          "description": "Operators automatically see only machines assigned to their shift, while technicians and managers see the entire plant fleet."
+        },
+        {
+          "title": "Digital Service Manuals",
+          "description": "Click 'Documents & Manuals' on any machine to view OEM PDF documentation, electrical schematics, and parts breakdown diagrams."
+        },
+        {
+          "title": "Equipment Administration",
+          "description": "Admins and Managers can add new machinery, update runtime meters, edit serial numbers, or upload technical documentation."
+        }
+      ],
+      "work_orders": [
+        {
+          "title": "Work Order Queue",
+          "description": "View and filter all maintenance work orders by status: Open, In Progress, On Hold for parts, or Completed."
+        },
+        {
+          "title": "Execution & Checklists",
+          "description": "Click 'Open / Execute' on any work order to follow step-by-step checklist tasks, enter sensor readings, and record progress."
+        },
+        {
+          "title": "Parts Consumption & Auto-Deduction",
+          "description": "Select consumed spare parts directly inside the execution modal. Stock is automatically deducted from inventory in real time."
+        },
+        {
+          "title": "Downtime & Root Cause Logging",
+          "description": "Record actual labor hours, machine downtime duration, and root causes before supervisor approval and final sign-off."
+        }
+      ],
+      "pm_schedules": [
+        {
+          "title": "Preventive Maintenance Cadence",
+          "description": "Manage maintenance routines configured to trigger based on calendar intervals (days) or runtime operating meters (hours)."
+        },
+        {
+          "title": "Upcoming & Overdue Triggers",
+          "description": "Track next due dates and meter targets. Schedules turn yellow when due soon and red when overdue."
+        },
+        {
+          "title": "Automated Work Order Scanner",
+          "description": "Click 'Scan Due PMs & Auto-Generate WOs' to scan all equipment schedules and generate ready-to-execute work orders with checklists."
+        },
+        {
+          "title": "Instant Manual Generation",
+          "description": "Click the lightning bolt 'Generate WO Now' icon on any schedule to trigger an immediate work order on demand."
+        }
+      ],
+      "parts_requests": [
+        {
+          "title": "Parts Requisition Queue",
+          "description": "Review all replacement parts requested by machine operators and technicians on the shop floor."
+        },
+        {
+          "title": "Submitting Requests with Photos",
+          "description": "Click '+ Request Part' to submit a requisition with mobile camera photos automatically compressed on the server."
+        },
+        {
+          "title": "Urgency Flags",
+          "description": "Requests are classified as Urgent (machine down), Normal, or Low. Urgent items appear prominently at the top of the queue."
+        },
+        {
+          "title": "Supervisor Purchasing Review",
+          "description": "Managers can approve, mark as ordered, add purchase order notes, and mark parts as received when delivered."
+        }
+      ],
+      "parts_catalog": [
+        {
+          "title": "Spare Parts Catalog",
+          "description": "Search parts by part number, name, or category to check current on-hand stock and physical tool-room bin locations."
+        },
+        {
+          "title": "Low Stock Indicators",
+          "description": "Items that fall below minimum reorder thresholds are automatically highlighted with red 'LOW STOCK' badges."
+        },
+        {
+          "title": "Automatic Inventory Sync",
+          "description": "When technicians complete work orders, parts consumed are automatically deducted from stock without manual spreadsheets."
+        },
+        {
+          "title": "Catalog Maintenance",
+          "description": "Managers and Admins can add new replacement parts, adjust unit costs, and update preferred suppliers."
+        }
+      ],
+      "analytics": [
+        {
+          "title": "Plant Reliability Metrics",
+          "description": "Analyze Mean Time Between Failures (MTBF) and Mean Time to Repair (MTTR) across all plant machinery."
+        },
+        {
+          "title": "PM Compliance Target (>95%)",
+          "description": "Monitor the percentage of preventive maintenance completed on time against the plant's 95% reliability benchmark."
+        },
+        {
+          "title": "Maintenance Cost Rollup",
+          "description": "Track total spend per asset broken down by actual technician labor hours ($65/hr) and catalog parts costs."
+        },
+        {
+          "title": "Top Consumed Parts",
+          "description": "Identify high-wear consumables and tooling driving the highest maintenance expenditures."
+        }
+      ],
+      "users": [
+        {
+          "title": "User Directory & RBAC",
+          "description": "Manage plant personnel across five role levels: Administrator, Maintenance Manager, Technician, Operator, and Viewer."
+        },
+        {
+          "title": "Operator Machine Scoping",
+          "description": "Click 'Assign Machines' to configure which specific equipment each operator can see and request parts for on the shop floor."
+        },
+        {
+          "title": "Password Resets & Security",
+          "description": "Quickly reset forgotten passwords or update user language preferences without affecting existing maintenance records."
+        },
+        {
+          "title": "Immutable Audit Trail",
+          "description": "All user creations, role updates, and deletions are permanently logged to the system audit trail."
+        }
+      ]
+    }
+  },
+  "quickref": {
+    "modal_title": "Role Quick-Reference Guide",
+    "print_btn": "Print Reference Card (8.5x11)",
+    "close_btn": "Close Guide",
+    "switch_role": "Preview / Print Guide for Role:",
+    "plant_header": "Custom Glass Industries, Inc. • Anaheim Glass Fabrication Plant",
+    "emergency_notice": "Keep this sheet posted at your workstation or tool chest for quick daily reference.",
+    "roles": {
+      "operator": {
+        "title": "Machine Operator Quick-Reference Guide",
+        "badge": "Plant Floor Operator",
+        "shift_checklist_title": "Shift Routine Checklist",
+        "shift_checklist": [
+          "1. Shift Start: Log into PM Portal on your line tablet and verify your assigned machinery is listed.",
+          "2. Pre-Check: Perform visual and pneumatic inspection before starting the line (vacuum pads, air pressure, glass guides).",
+          "3. Mid-Shift: If strange noises, vibration, or glass chipping occurs, immediately submit a Parts Request.",
+          "4. Machine Stoppage: If the machine halts, notify your supervisor immediately so the outage is logged on the Wallboard.",
+          "5. Shift End: Clean cutting/washing debris, check oil levels, and ensure work area is clear."
+        ],
+        "sections": [
+          {
+            "heading": "How to Request a Replacement Part",
+            "steps": [
+              "Open 'Parts Requests' from the top navigation bar or machine card.",
+              "Click '+ Request Part' and select your machine.",
+              "Choose a catalog part OR type a description of the damaged component.",
+              "Attach a photo using the tablet camera — clear photos verify part model instantly.",
+              "Select Urgency: Urgent (machine down), Normal (running with wear), or Low (future spare).",
+              "Click 'Submit Requisition' — supervisors are alerted immediately."
+            ]
+          },
+          {
+            "heading": "How to Access Equipment Manuals",
+            "steps": [
+              "Navigate to 'My Assigned Equipment'.",
+              "Click 'Documents & Manuals' on your machine card.",
+              "Click 'View / Download' on any OEM manual or schematic to open it on your tablet."
+            ]
+          }
+        ],
+        "urgency_guide_title": "Parts Request Urgency Matrix",
+        "urgency_guide": [
+          {
+            "level": "URGENT",
+            "desc": "Machine is completely stopped or producing defective glass out of spec. Line halted."
+          },
+          {
+            "level": "NORMAL",
+            "desc": "Machine is operating safely but part shows wear, air seepage, or nearing end of life."
+          },
+          {
+            "level": "LOW",
+            "desc": "Routine replacement consumable or spare backup for future maintenance cycles."
+          }
+        ],
+        "contacts_title": "Plant Floor Contacts",
+        "contacts": [
+          {
+            "role": "Maintenance Supervisor",
+            "ext": "Ext. 204 / Radio Channel 2"
+          },
+          {
+            "role": "Parts Room / Tool Crib",
+            "ext": "Ext. 210 / Bay 3"
+          },
+          {
+            "role": "Plant Operations Manager",
+            "ext": "Ext. 101 / Office"
+          }
+        ]
+      },
+      "technician": {
+        "title": "Maintenance Technician Quick-Reference Guide",
+        "badge": "Maintenance & Reliability",
+        "shift_checklist_title": "Shift Maintenance Workflow",
+        "shift_checklist": [
+          "1. Start of Shift: Review the Wallboard for active machine outages and open high-priority work orders.",
+          "2. Parts Verification: Verify availability in the Parts Inventory catalog before disassembling equipment.",
+          "3. Work Order Execution: Complete each checklist step and record sensor/gauge measurements.",
+          "4. Parts Deduction: Record consumed parts inside the work order so stock auto-deducts.",
+          "5. Sign-Off & Close: Log actual labor hours, downtime duration, and root cause before closing."
+        ],
+        "sections": [
+          {
+            "heading": "Executing Work Orders & Recording Parts",
+            "steps": [
+              "Open 'Work Orders' and filter by 'Open & Assigned'.",
+              "Click 'Open / Execute' on the scheduled ticket to open the execution dialog.",
+              "Perform tasks in sequence and check off items as completed.",
+              "Under 'Parts Consumed', select each part used from the catalog and enter quantity.",
+              "Click '+ Add Used Part' — inventory stock is deducted automatically in real time."
+            ]
+          },
+          {
+            "heading": "Logging Downtime & Root Cause",
+            "steps": [
+              "Enter exact machine downtime in minutes and your logged technician labor hours.",
+              "Select or enter the root cause (e.g. 'Bearing seizure', 'Solenoid valve burnout').",
+              "Provide brief corrective notes on adjustments made to prevent recurrence.",
+              "Click 'Complete Work Order' to close ticket and reset the PM schedule's next due date."
+            ]
+          }
+        ],
+        "urgency_guide_title": "Work Order Priority Classification",
+        "urgency_guide": [
+          {
+            "level": "CRITICAL",
+            "desc": "Active plant stoppage, safety hazard, or production bottleneck. Immediate response."
+          },
+          {
+            "level": "HIGH",
+            "desc": "Impaired machine running at reduced speed or overdue preventive maintenance."
+          },
+          {
+            "level": "MEDIUM",
+            "desc": "Standard scheduled PM routine or minor non-halting corrective repair."
+          },
+          {
+            "level": "LOW",
+            "desc": "Cosmetic adjustment, general cleaning, or optional tooling inspection."
+          }
+        ],
+        "contacts_title": "Maintenance Escalations",
+        "contacts": [
+          {
+            "role": "Maintenance Lead",
+            "ext": "Ext. 205 / Radio Ch 1"
+          },
+          {
+            "role": "Tooling & Purchasing",
+            "ext": "Ext. 215 / Purchasing Office"
+          },
+          {
+            "role": "Safety Director",
+            "ext": "Ext. 112 / First Aid Room"
+          }
+        ]
+      },
+      "manager": {
+        "title": "Plant Manager & Administrator Quick-Reference Guide",
+        "badge": "Plant Operations & Administration",
+        "shift_checklist_title": "Management & Reliability Cadence",
+        "shift_checklist": [
+          "1. Morning Wallboard Review: Check overall plant uptime %, active machine outages, and aging parts queue.",
+          "2. Daily PM Auto-Scan: Click 'Scan Due PMs' in PM Schedules to generate today's preventive tickets.",
+          "3. Parts Requisitions: Review pending parts requests, verify supplier lead times, and approve POs.",
+          "4. Inventory Auditing: Review low-stock indicators in Parts Catalog and trigger restock orders.",
+          "5. Weekly KPI Audit: Review MTBF, MTTR, and PM compliance rate (>95% plant standard) in Analytics."
+        ],
+        "sections": [
+          {
+            "heading": "PM Schedule Automation & Triggers",
+            "steps": [
+              "Open 'PM Schedules' to inspect active calendar and meter maintenance routines.",
+              "Set triggers to 'Whichever Comes First' for high-cycle machines (e.g. 30 days OR 250 hours).",
+              "Click 'Scan Due PMs & Auto-Generate WOs' to generate work orders for due schedules automatically.",
+              "Click the lightning icon on any schedule to trigger an ad-hoc work order instantly."
+            ]
+          },
+          {
+            "heading": "User Administration & Operator Scoping",
+            "steps": [
+              "Open 'User Management' to oversee plant staff, passwords, and access levels.",
+              "Click 'Assign Machines' on any operator to scope their visibility to specific lines.",
+              "Scoped operators can only view and request parts for their assigned equipment."
+            ]
+          }
+        ],
+        "urgency_guide_title": "Core Plant Reliability Benchmarks",
+        "urgency_guide": [
+          {
+            "level": "PM Compliance >95%",
+            "desc": "Target 95%+ of PM routines completed within grace window to prevent breakdowns."
+          },
+          {
+            "level": "MTBF Target",
+            "desc": "Mean Time Between Failures: Higher hours = lower unexpected stoppage."
+          },
+          {
+            "level": "MTTR Target",
+            "desc": "Mean Time to Repair: Minimize average hours from breakdown to operational return."
+          }
+        ],
+        "contacts_title": "Plant Key Personnel",
+        "contacts": [
+          {
+            "role": "Anaheim Plant Director",
+            "ext": "Ext. 100 / Executive Office"
+          },
+          {
+            "role": "Operations Lead",
+            "ext": "Ext. 105 / Shop Floor Office"
+          },
+          {
+            "role": "IT & Systems Admin",
+            "ext": "Ext. 300 / Server Room"
+          }
+        ]
+      }
+    }
+  },
+  "feedback": {
+    "delete_success": "Item deleted successfully",
+    "delete_failed": "Failed to delete item",
+    "save_success": "Changes saved successfully",
+    "save_failed": "Failed to save changes",
+    "server_error": "Server encountered an unexpected error",
+    "password_updated": "Password updated successfully",
+    "upload_failed": "Document upload failed",
+    "wo_generated": "Work order generated successfully",
+    "wo_generate_failed": "Failed to generate work order",
+    "part_consumed_success": "Part consumed and stock auto-deducted",
+    "part_consumed_failed": "Failed to record part consumption",
+    "part_removed_success": "Part entry removed and stock refunded",
+    "part_removed_failed": "Failed to remove consumed part"
   }
 }
