@@ -9,8 +9,10 @@
     "preview": "vite preview --port 3001"
   },
   "dependencies": {
+    "html5-qrcode": "^2.3.8",
     "i18next": "^23.14.0",
     "lucide-react": "^0.460.0",
+    "qrcode": "^1.5.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-i18next": "^15.0.1"

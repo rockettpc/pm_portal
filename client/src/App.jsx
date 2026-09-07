@@ -14,6 +14,8 @@ import { UserManagementView } from './components/UserManagementView';
 import { HelpPanel } from './components/HelpPanel';
 import { GuidedTour } from './components/GuidedTour';
 import { QuickReferenceModal } from './components/QuickReferenceModal';
+import { AuditLogView } from './components/AuditLogView';
+import { QRScannerModal } from './components/QRScannerModal';
 import { HelpCircle, FileText } from 'lucide-react';
 
 class ErrorBoundary extends React.Component {
@@ -60,6 +62,8 @@ const MainLayout = () => {
   const [isQuickRefOpen, setIsQuickRefOpen] = useState(false);
   const [tourModule, setTourModule] = useState(null);
   const [forceTour, setForceTour] = useState(false);
+  const [globalQrScannerOpen, setGlobalQrScannerOpen] = useState(false);
+  const [targetAssetId, setTargetAssetId] = useState(null);
 
   React.useEffect(() => {
     if (user?.role === 'operator') {
@@ -94,18 +98,20 @@ const MainLayout = () => {
         setActiveTab={setActiveTab}
         onOpenHelp={() => setIsHelpOpen(true)}
         onOpenQuickRef={() => setIsQuickRefOpen(true)}
+        onOpenScanQR={() => setGlobalQrScannerOpen(true)}
       />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <ErrorBoundary>
           {activeTab === 'dashboard' && <DashboardView setActiveTab={setActiveTab} />}
           {activeTab === 'analytics' && <AnalyticsView />}
-          {activeTab === 'equipment' && <EquipmentView />}
+          {activeTab === 'equipment' && <EquipmentView targetAssetId={targetAssetId} />}
           {activeTab === 'work-orders' && <WorkOrdersView />}
           {activeTab === 'pm-schedules' && <PMSchedulesView />}
           {activeTab === 'parts-requests' && <PartsRequestsView />}
           {activeTab === 'parts-catalog' && <PartsCatalogView />}
           {activeTab === 'users' && ['admin', 'manager'].includes(user?.role) && <UserManagementView />}
+          {activeTab === 'audit-log' && ['admin', 'manager'].includes(user?.role) && <AuditLogView />}
         </ErrorBoundary>
       </main>
 
@@ -153,6 +159,16 @@ const MainLayout = () => {
       <QuickReferenceModal
         isOpen={isQuickRefOpen}
         onClose={() => setIsQuickRefOpen(false)}
+      />
+
+      {/* Global Camera QR Code Scanner */}
+      <QRScannerModal
+        isOpen={globalQrScannerOpen}
+        onClose={() => setGlobalQrScannerOpen(false)}
+        onScanSuccess={(scannedAssetId) => {
+          setTargetAssetId(scannedAssetId);
+          setActiveTab('equipment');
+        }}
       />
     </div>
   );

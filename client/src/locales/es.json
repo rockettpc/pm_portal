@@ -16,7 +16,9 @@
     "group_parts": "Repuestos y Suministros",
     "group_management": "Administración",
     "logout": "Cerrar Sesión",
-    "role_badge": "Rol"
+    "role_badge": "Rol",
+    "audit_log": "Historial de Auditoría",
+    "scan_qr": "Escanear QR"
   },
   "dashboard": {
     "title": "Mural de Estado de Planta y Tiempo Operativo",
@@ -1099,5 +1101,35 @@
     "part_consumed_failed": "Error al registrar consumo de repuesto",
     "part_removed_success": "Registro de repuesto eliminado y stock reintegrado",
     "part_removed_failed": "Error al eliminar repuesto consumido"
+  },
+  "qr": {
+    "modal_title": "Etiqueta QR de Activo",
+    "scanner_title": "Escanear QR de Maquinaria",
+    "scanner_hint": "Apunte la cámara a la etiqueta QR de cualquier máquina para abrir detalles, manuales y registros.",
+    "manual_lookup_label": "O buscar por Placa de Activo",
+    "print_btn": "Imprimir Etiqueta",
+    "download_btn": "Descargar PNG",
+    "scan_asset_btn": "Escanear QR",
+    "view_qr_btn": "Etiqueta QR"
+  },
+  "quick_add": {
+    "title": "Alta Rápida de Maquinaria",
+    "subtitle": "Formulario rápido con validación de números de serie duplicados",
+    "save_and_add_another": "Guardar y Agregar Otra",
+    "quick_add_btn": "Alta Rápida"
+  },
+  "audit": {
+    "title": "Historial de Auditoría y Cumplimiento",
+    "subtitle": "Registro inmutable de mutaciones, inicios de sesión y eventos de mantenimiento en la planta",
+    "search_placeholder": "Buscar usuario, acción, entidad, detalles...",
+    "all_actions": "Todas las Acciones",
+    "all_entities": "Todas las Entidades",
+    "col_timestamp": "Fecha y Hora",
+    "col_user": "Usuario",
+    "col_action": "Acción",
+    "col_entity": "Entidad",
+    "col_details": "Detalles",
+    "export_btn": "Exportar CSV",
+    "no_records": "No se encontraron registros de auditoría con los filtros seleccionados."
   }
 }

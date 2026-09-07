@@ -4,14 +4,20 @@ import { useAuth } from '../context/AuthContext';
 import { 
   Wrench, AlertTriangle, CheckCircle, Clock, FileText, 
   Upload, Plus, Search, MapPin, Building, ShieldAlert,
-  Download, Eye, Filter, Edit, Trash2
+  Download, Eye, Filter, Edit, Trash2, QrCode, Camera, Zap
 } from 'lucide-react';
+import { QRCodeModal } from './QRCodeModal';
+import { QRScannerModal } from './QRScannerModal';
+import { EquipmentQuickAddModal } from './EquipmentQuickAddModal';
 
-export const EquipmentView = () => {
+export const EquipmentView = ({ targetAssetId = null }) => {
   const { t } = useTranslation();
   const { user } = useAuth();
 
   const [equipment, setEquipment] = useState([]);
+  const [qrTargetAsset, setQrTargetAsset] = useState(null);
+  const [showQrScanner, setShowQrScanner] = useState(false);
+  const [showQuickAddModal, setShowQuickAddModal] = useState(false);
   const [locations, setLocations] = useState([]);
   const [vendors, setVendors] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -95,6 +101,20 @@ export const EquipmentView = () => {
     fetchEquipment();
     fetchAuxData();
   }, []);
+
+  // Auto-open asset if targetAssetId or URL param is provided
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const requestedAssetId = targetAssetId || params.get('asset_id');
+    if (requestedAssetId && equipment.length > 0) {
+      const match = equipment.find(
+        (e) => e.asset_id?.toLowerCase() === requestedAssetId.toLowerCase()
+      );
+      if (match) {
+        openAssetDetail(match);
+      }
+    }
+  }, [equipment, targetAssetId]);
 
   const openAssetDetail = async (asset) => {
     setSelectedAsset(asset);
@@ -347,15 +367,39 @@ export const EquipmentView = () => {
           </p>
         </div>
 
-        {['admin', 'manager'].includes(user?.role) && (
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Scan QR Button for all shop users */}
           <button
-            onClick={() => setShowAddModal(true)}
-            className="inline-flex items-center gap-2 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold px-4 py-2.5 rounded-lg shadow-md shadow-cyan-900/30 transition"
+            onClick={() => setShowQrScanner(true)}
+            className="inline-flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 text-cyan-300 border border-slate-700/80 text-xs font-semibold px-3 py-2 rounded-lg transition"
+            title={t('qr.scanner_title')}
           >
-            <Plus size={16} />
-            {t('equipment.add_asset')}
+            <Camera size={14} className="text-cyan-400" />
+            <span>{t('qr.scan_asset_btn')}</span>
           </button>
-        )}
+
+          {/* Quick-Add & Standard Add for Managers/Admins */}
+          {['admin', 'manager'].includes(user?.role) && (
+            <>
+              <button
+                onClick={() => setShowQuickAddModal(true)}
+                className="inline-flex items-center gap-1.5 bg-cyan-950/70 hover:bg-cyan-900/80 text-cyan-300 border border-cyan-800/60 text-xs font-semibold px-3 py-2 rounded-lg transition"
+                title={t('quick_add.subtitle')}
+              >
+                <Zap size={14} className="text-amber-400" />
+                <span>{t('quick_add.quick_add_btn')}</span>
+              </button>
+
+              <button
+                onClick={() => setShowAddModal(true)}
+                className="inline-flex items-center gap-1.5 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold px-3.5 py-2 rounded-lg shadow-md shadow-cyan-900/30 transition"
+              >
+                <Plus size={15} />
+                <span>{t('equipment.add_asset')}</span>
+              </button>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Filter and Search Bar */}
@@ -485,6 +529,13 @@ export const EquipmentView = () => {
                     </>
                   )}
                   <button
+                    onClick={() => setQrTargetAsset(asset)}
+                    title={t('qr.view_qr_btn', 'QR Tag')}
+                    className="p-1.5 text-slate-400 hover:text-cyan-300 hover:bg-slate-800 rounded-lg transition"
+                  >
+                    <QrCode size={14} />
+                  </button>
+                  <button
                     onClick={() => openAssetDetail(asset)}
                     className="inline-flex items-center gap-1.5 text-xs font-semibold text-cyan-400 hover:text-cyan-300 bg-cyan-950/50 hover:bg-cyan-900/50 border border-cyan-800/60 px-3 py-1.5 rounded-lg transition"
                   >
@@ -524,6 +575,14 @@ export const EquipmentView = () => {
                     {t('equipment.edit_asset')}
                   </button>
                 )}
+                <button
+                  onClick={() => setQrTargetAsset(selectedAsset)}
+                  className="inline-flex items-center gap-1 bg-slate-800 hover:bg-slate-700 text-cyan-400 text-xs px-2.5 py-1.5 rounded-lg border border-slate-700 transition"
+                  title={t('qr.view_qr_btn', 'QR Tag')}
+                >
+                  <QrCode size={13} />
+                  <span>{t('qr.view_qr_btn', 'QR Tag')}</span>
+                </button>
                 <button
                   onClick={() => setShowDetailModal(false)}
                   className="text-slate-400 hover:text-white text-lg font-bold px-2 py-1"
@@ -1017,6 +1076,40 @@ export const EquipmentView = () => {
           </div>
         </div>
       )}
+
+      {/* QR Code Printable Modal */}
+      <QRCodeModal
+        isOpen={Boolean(qrTargetAsset)}
+        onClose={() => setQrTargetAsset(null)}
+        equipment={qrTargetAsset}
+      />
+
+      {/* QR Scanner Camera Modal */}
+      <QRScannerModal
+        isOpen={showQrScanner}
+        onClose={() => setShowQrScanner(false)}
+        onScanSuccess={(scannedAssetId) => {
+          const match = equipment.find(
+            (e) => e.asset_id?.toLowerCase() === scannedAssetId.toLowerCase()
+          );
+          if (match) {
+            openAssetDetail(match);
+          } else {
+            setSearchTerm(scannedAssetId);
+          }
+        }}
+      />
+
+      {/* Fast Quick-Add Equipment Modal */}
+      <EquipmentQuickAddModal
+        isOpen={showQuickAddModal}
+        onClose={() => setShowQuickAddModal(false)}
+        existingEquipment={equipment}
+        locations={locations}
+        onEquipmentCreated={(newlyCreated) => {
+          fetchEquipment();
+        }}
+      />
     </div>
   );
 };

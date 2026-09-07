@@ -20,10 +20,12 @@ import {
   Eye,
   Wrench,
   HelpCircle,
-  FileText
+  FileText,
+  ShieldAlert,
+  Camera
 } from 'lucide-react';
 
-export const Navbar = ({ activeTab, setActiveTab, onOpenHelp, onOpenQuickRef }) => {
+export const Navbar = ({ activeTab, setActiveTab, onOpenHelp, onOpenQuickRef, onOpenScanQR }) => {
   const { t, i18n } = useTranslation();
   const { user, logout, updateLanguage } = useAuth();
 
@@ -84,7 +86,7 @@ export const Navbar = ({ activeTab, setActiveTab, onOpenHelp, onOpenQuickRef }) 
 
   const isMaintenanceActive = ['work-orders', 'pm-schedules'].includes(activeTab);
   const isPartsActive = ['parts-requests', 'parts-catalog'].includes(activeTab);
-  const isManagementActive = ['analytics', 'users'].includes(activeTab);
+  const isManagementActive = ['analytics', 'users', 'audit-log'].includes(activeTab);
 
   const handleTabClick = (tab) => {
     setActiveTab(tab);
@@ -287,19 +289,35 @@ export const Navbar = ({ activeTab, setActiveTab, onOpenHelp, onOpenQuickRef }) 
                     </button>
 
                     {['admin', 'manager'].includes(user?.role) && (
-                      <button
-                        onClick={() => handleTabClick('users')}
-                        className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition ${
-                          activeTab === 'users'
-                            ? 'bg-cyan-500/20 text-cyan-300 font-semibold'
-                            : 'text-slate-300 hover:text-white hover:bg-slate-800'
-                        }`}
-                      >
-                        <Users size={14} className="text-cyan-400" />
-                        <div className="text-left">
-                          <div>{t('nav.users')}</div>
-                        </div>
-                      </button>
+                      <>
+                        <button
+                          onClick={() => handleTabClick('users')}
+                          className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition ${
+                            activeTab === 'users'
+                              ? 'bg-cyan-500/20 text-cyan-300 font-semibold'
+                              : 'text-slate-300 hover:text-white hover:bg-slate-800'
+                          }`}
+                        >
+                          <Users size={14} className="text-cyan-400" />
+                          <div className="text-left">
+                            <div>{t('nav.users')}</div>
+                          </div>
+                        </button>
+
+                        <button
+                          onClick={() => handleTabClick('audit-log')}
+                          className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition ${
+                            activeTab === 'audit-log'
+                              ? 'bg-cyan-500/20 text-cyan-300 font-semibold'
+                              : 'text-slate-300 hover:text-white hover:bg-slate-800'
+                          }`}
+                        >
+                          <ShieldAlert size={14} className="text-cyan-400" />
+                          <div className="text-left">
+                            <div>{t('nav.audit_log')}</div>
+                          </div>
+                        </button>
+                      </>
                     )}
                   </div>
                 )}
@@ -307,8 +325,18 @@ export const Navbar = ({ activeTab, setActiveTab, onOpenHelp, onOpenQuickRef }) 
             )}
           </nav>
 
-          {/* Right Action Bar: Language Toggle, User Profile, and Mobile Hamburger */}
+          {/* Right Action Bar: Scan QR, Help, Language, User Profile, Mobile Hamburger */}
           <div className="flex items-center gap-2 sm:gap-3">
+            {/* Quick QR Scanner Trigger */}
+            <button
+              onClick={onOpenScanQR}
+              className="flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-cyan-300 text-xs px-2.5 py-1.5 rounded-lg border border-slate-800 hover:border-slate-700 transition"
+              title={t('qr.scanner_title')}
+            >
+              <Camera size={14} className="text-cyan-400" />
+              <span className="font-semibold hidden md:inline">{t('nav.scan_qr')}</span>
+            </button>
+
             {/* Contextual Help Panel Trigger */}
             <button
               onClick={onOpenHelp}
@@ -473,23 +501,47 @@ export const Navbar = ({ activeTab, setActiveTab, onOpenHelp, onOpenQuickRef }) 
               </button>
 
               {['admin', 'manager'].includes(user?.role) && (
-                <button
-                  onClick={() => handleTabClick('users')}
-                  className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition ${
-                    activeTab === 'users'
-                      ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40'
-                      : 'text-slate-300 hover:bg-slate-900'
-                  }`}
-                >
-                  <Users size={16} className="text-cyan-400" />
-                  <span>{t('nav.users')}</span>
-                </button>
+                <>
+                  <button
+                    onClick={() => handleTabClick('users')}
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition ${
+                      activeTab === 'users'
+                        ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40'
+                        : 'text-slate-300 hover:bg-slate-900'
+                    }`}
+                  >
+                    <Users size={16} className="text-cyan-400" />
+                    <span>{t('nav.users')}</span>
+                  </button>
+
+                  <button
+                    onClick={() => handleTabClick('audit-log')}
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition ${
+                      activeTab === 'audit-log'
+                        ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40'
+                        : 'text-slate-300 hover:bg-slate-900'
+                    }`}
+                  >
+                    <ShieldAlert size={16} className="text-cyan-400" />
+                    <span>{t('nav.audit_log')}</span>
+                  </button>
+                </>
               )}
             </>
           )}
 
-          {/* Help & Quick-Ref in Mobile Menu */}
+          {/* Quick Actions in Mobile Menu */}
           <div className="pt-2 border-t border-slate-800/80 mt-2 space-y-1">
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                if (onOpenScanQR) onOpenScanQR();
+              }}
+              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold text-cyan-300 hover:bg-cyan-950/40 border border-cyan-900/40 transition"
+            >
+              <Camera size={16} className="text-cyan-400" />
+              <span>{t('nav.scan_qr')}</span>
+            </button>
             <button
               onClick={() => {
                 setMobileMenuOpen(false);

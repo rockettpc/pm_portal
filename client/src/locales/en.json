@@ -16,7 +16,9 @@
     "group_parts": "Parts & Supplies",
     "group_management": "Management",
     "logout": "Sign Out",
-    "role_badge": "Role"
+    "role_badge": "Role",
+    "audit_log": "Audit Trail",
+    "scan_qr": "Scan QR"
   },
   "dashboard": {
     "title": "Shop Floor Status & Uptime Wallboard",
@@ -1099,5 +1101,35 @@
     "part_consumed_failed": "Failed to record part consumption",
     "part_removed_success": "Part entry removed and stock refunded",
     "part_removed_failed": "Failed to remove consumed part"
+  },
+  "qr": {
+    "modal_title": "Equipment QR Asset Tag",
+    "scanner_title": "Scan Machine Asset QR",
+    "scanner_hint": "Point camera at any machine QR sticker to open equipment details, manuals, and service logs.",
+    "manual_lookup_label": "Or Lookup by Asset Tag",
+    "print_btn": "Print Sticker",
+    "download_btn": "Download PNG",
+    "scan_asset_btn": "Scan QR",
+    "view_qr_btn": "QR Tag"
+  },
+  "quick_add": {
+    "title": "Rapid Quick-Add Equipment",
+    "subtitle": "Fast-entry form with instant serial duplicate detection",
+    "save_and_add_another": "Save & Add Another",
+    "quick_add_btn": "Quick Add"
+  },
+  "audit": {
+    "title": "System Audit Trail & Compliance Log",
+    "subtitle": "Permanent append-only record of mutations, logins, and maintenance events across all plant assets",
+    "search_placeholder": "Search username, action, entity, details...",
+    "all_actions": "All Actions",
+    "all_entities": "All Entities",
+    "col_timestamp": "Timestamp",
+    "col_user": "User",
+    "col_action": "Action",
+    "col_entity": "Entity",
+    "col_details": "Details",
+    "export_btn": "Export CSV",
+    "no_records": "No audit log records found matching your filters."
   }
 }
