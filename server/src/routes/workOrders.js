@@ -294,6 +294,33 @@ router.put('/:id', requireRole(['admin', 'manager', 'technician']), async (req, 
       values.push(priority);
     }
 
+    // Additional fields editable by manager/admin
+    const isElevated = ['admin', 'manager'].includes(req.user.role);
+    if (isElevated && req.body.title !== undefined) {
+      updates.push(`title = $${idx++}`);
+      values.push(req.body.title.trim());
+    }
+    if (isElevated && req.body.description !== undefined) {
+      updates.push(`description = $${idx++}`);
+      values.push(req.body.description ? req.body.description.trim() : null);
+    }
+    if (isElevated && req.body.type !== undefined) {
+      updates.push(`type = $${idx++}`);
+      values.push(req.body.type);
+    }
+    if (isElevated && req.body.equipment_id !== undefined) {
+      updates.push(`equipment_id = $${idx++}`);
+      values.push(parseInt(req.body.equipment_id, 10));
+    }
+    if (isElevated && req.body.due_date !== undefined) {
+      updates.push(`due_date = $${idx++}`);
+      values.push(req.body.due_date || null);
+    }
+    if (isElevated && req.body.estimated_hours !== undefined) {
+      updates.push(`estimated_hours = $${idx++}`);
+      values.push(parseFloat(req.body.estimated_hours) || 1.0);
+    }
+
     // Supervisor sign-off (Manager or Admin)
     if (supervisor_signoff && ['admin', 'manager'].includes(req.user.role)) {
       updates.push(`supervisor_signoff_by = $${idx++}`);
@@ -313,6 +340,12 @@ router.put('/:id', requireRole(['admin', 'manager', 'technician']), async (req, 
       values
     );
 
+    // Audit log
+    await query(
+      'INSERT INTO audit_log (user_id, action, entity_type, entity_id, details) VALUES ($1, $2, $3, $4, $5)',
+      [req.user.id, 'UPDATE_WORK_ORDER', 'work_order', id, JSON.stringify({ wo_number: updateRes.rows[0].wo_number, title: updateRes.rows[0].title })]
+    );
+
     res.json({
       message: 'Work order updated successfully',
       work_order: updateRes.rows[0],
@@ -320,6 +353,37 @@ router.put('/:id', requireRole(['admin', 'manager', 'technician']), async (req, 
   } catch (error) {
     console.error('[work-orders PUT /:id] Error:', error);
     res.status(500).json({ error: 'Server error updating work order' });
+  }
+});
+
+// DELETE /api/work-orders/:id - Delete work order and restore inventory (Admin only)
+router.delete('/:id', requireRole(['admin']), async (req, res) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    const checkRes = await query('SELECT id, wo_number, title FROM work_orders WHERE id = $1', [id]);
+    if (checkRes.rows.length === 0) {
+      return res.status(404).json({ error: 'Work order not found' });
+    }
+    const wo = checkRes.rows[0];
+
+    // Restore any consumed parts to inventory before deleting
+    const consumedParts = await query('SELECT part_id, quantity FROM work_order_parts WHERE work_order_id = $1', [id]);
+    for (const cp of consumedParts.rows) {
+      await query('UPDATE parts SET quantity_on_hand = quantity_on_hand + $1, updated_at = NOW() WHERE id = $2', [cp.quantity, cp.part_id]);
+    }
+
+    await query('DELETE FROM work_orders WHERE id = $1', [id]);
+
+    // Audit log
+    await query(
+      'INSERT INTO audit_log (user_id, action, entity_type, entity_id, details) VALUES ($1, $2, $3, $4, $5)',
+      [req.user.id, 'DELETE_WORK_ORDER', 'work_order', id, JSON.stringify({ wo_number: wo.wo_number, title: wo.title })]
+    );
+
+    res.json({ message: `Work Order '${wo.wo_number}' deleted successfully and consumed parts returned to inventory` });
+  } catch (error) {
+    console.error('[work-orders DELETE /:id] Error:', error);
+    res.status(500).json({ error: 'Server error deleting work order' });
   }
 });
 

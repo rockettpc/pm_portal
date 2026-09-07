@@ -202,6 +202,7 @@ router.put('/:id', requireRole(['admin', 'manager']), async (req, res) => {
   try {
     const id = parseInt(req.params.id, 10);
     const {
+      equipment_id,
       title,
       description,
       trigger_type,
@@ -220,6 +221,7 @@ router.put('/:id', requireRole(['admin', 'manager']), async (req, res) => {
     const values = [];
     let idx = 1;
 
+    if (equipment_id !== undefined) { fields.push(`equipment_id = $${idx++}`); values.push(parseInt(equipment_id, 10)); }
     if (title !== undefined) { fields.push(`title = $${idx++}`); values.push(title.trim()); }
     if (description !== undefined) { fields.push(`description = $${idx++}`); values.push(description); }
     if (trigger_type !== undefined) { fields.push(`trigger_type = $${idx++}`); values.push(trigger_type); }
@@ -230,8 +232,8 @@ router.put('/:id', requireRole(['admin', 'manager']), async (req, res) => {
     if (assigned_to !== undefined) { fields.push(`assigned_to = $${idx++}`); values.push(assigned_to ? parseInt(assigned_to, 10) : null); }
     if (checklist !== undefined) { fields.push(`checklist = $${idx++}`); values.push(JSON.stringify(checklist)); }
     if (is_active !== undefined) { fields.push(`is_active = $${idx++}`); values.push(Boolean(is_active)); }
-    if (next_due_date !== undefined) { fields.push(`next_due_date = $${idx++}`); values.push(next_due_date); }
-    if (next_due_meter !== undefined) { fields.push(`next_due_meter = $${idx++}`); values.push(next_due_meter); }
+    if (next_due_date !== undefined) { fields.push(`next_due_date = $${idx++}`); values.push(next_due_date || null); }
+    if (next_due_meter !== undefined) { fields.push(`next_due_meter = $${idx++}`); values.push(next_due_meter !== null && next_due_meter !== '' ? parseFloat(next_due_meter) : null); }
 
     if (fields.length === 0) {
       return res.status(400).json({ error: 'No fields provided to update' });
@@ -249,10 +251,41 @@ router.put('/:id', requireRole(['admin', 'manager']), async (req, res) => {
       return res.status(404).json({ error: 'PM schedule not found' });
     }
 
+    // Audit log
+    await query(
+      'INSERT INTO audit_log (user_id, action, entity_type, entity_id, details) VALUES ($1, $2, $3, $4, $5)',
+      [req.user.id, 'UPDATE_PM_SCHEDULE', 'pm_schedule', id, JSON.stringify({ schedule_code: updateRes.rows[0].schedule_code, title: updateRes.rows[0].title })]
+    );
+
     res.json({ message: 'PM schedule updated', schedule: updateRes.rows[0] });
   } catch (error) {
     console.error('[pm-schedules PUT /:id] Error:', error);
     res.status(500).json({ error: 'Server error updating PM schedule' });
+  }
+});
+
+// DELETE /api/pm-schedules/:id - Delete PM schedule (Admin only)
+router.delete('/:id', requireRole(['admin']), async (req, res) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    const checkRes = await query('SELECT id, schedule_code, title FROM pm_schedules WHERE id = $1', [id]);
+    if (checkRes.rows.length === 0) {
+      return res.status(404).json({ error: 'PM schedule not found' });
+    }
+    const schedule = checkRes.rows[0];
+
+    await query('DELETE FROM pm_schedules WHERE id = $1', [id]);
+
+    // Audit log
+    await query(
+      'INSERT INTO audit_log (user_id, action, entity_type, entity_id, details) VALUES ($1, $2, $3, $4, $5)',
+      [req.user.id, 'DELETE_PM_SCHEDULE', 'pm_schedule', id, JSON.stringify({ schedule_code: schedule.schedule_code, title: schedule.title })]
+    );
+
+    res.json({ message: `PM Schedule '${schedule.schedule_code}' deleted successfully` });
+  } catch (error) {
+    console.error('[pm-schedules DELETE /:id] Error:', error);
+    res.status(500).json({ error: 'Server error deleting PM schedule' });
   }
 });
 

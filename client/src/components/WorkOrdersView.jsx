@@ -4,7 +4,8 @@ import { useAuth } from '../context/AuthContext';
 import { 
   CheckSquare, Plus, Clock, AlertTriangle, AlertCircle, Wrench, 
   Play, Pause, CheckCircle2, User, Calendar, DollarSign, Trash2, 
-  ShieldCheck, ArrowRight, Layers, Tag, FileText, ChevronRight
+  ShieldCheck, ArrowRight, Layers, Tag, FileText, ChevronRight,
+  Edit
 } from 'lucide-react';
 
 export const WorkOrdersView = () => {
@@ -54,6 +55,105 @@ export const WorkOrdersView = () => {
   });
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState('');
+
+  // Edit Work Order Modal
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editWo, setEditWo] = useState(null);
+  const [editingWo, setEditingWo] = useState(false);
+  const [editWoError, setEditWoError] = useState('');
+
+  // Delete Work Order Modal
+  const [deleteWoTarget, setDeleteWoTarget] = useState(null);
+  const [deletingWo, setDeletingWo] = useState(false);
+
+  const handleOpenEditWo = (wo) => {
+    setEditWo({
+      id: wo.id,
+      wo_number: wo.wo_number,
+      title: wo.title || '',
+      description: wo.description || '',
+      type: wo.type || 'Corrective',
+      priority: wo.priority || 'Medium',
+      status: wo.status || 'Open',
+      equipment_id: wo.equipment_id ? String(wo.equipment_id) : '',
+      assigned_to: wo.assigned_to ? String(wo.assigned_to) : '',
+      due_date: wo.due_date ? wo.due_date.split('T')[0] : '',
+      estimated_hours: wo.estimated_hours || 1.0,
+    });
+    setEditWoError('');
+    setShowEditModal(true);
+  };
+
+  const handleUpdateWo = async (e) => {
+    e.preventDefault();
+    setEditWoError('');
+    if (!editWo.title || !editWo.equipment_id) {
+      setEditWoError('Title and equipment are required');
+      return;
+    }
+
+    try {
+      setEditingWo(true);
+      const res = await fetch(`/api/work-orders/${editWo.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          title: editWo.title,
+          description: editWo.description,
+          type: editWo.type,
+          priority: editWo.priority,
+          status: editWo.status,
+          equipment_id: editWo.equipment_id,
+          assigned_to: editWo.assigned_to || null,
+          due_date: editWo.due_date || null,
+          estimated_hours: editWo.estimated_hours,
+        }),
+      });
+
+      if (res.ok) {
+        setShowEditModal(false);
+        setEditWo(null);
+        fetchWorkOrders();
+        if (selectedWo && selectedWo.id === editWo.id) {
+          openExecutionModal(editWo);
+        }
+      } else {
+        const data = await res.json();
+        setEditWoError(data.error || 'Failed to update work order');
+      }
+    } catch (err) {
+      setEditWoError('Server error updating work order');
+    } finally {
+      setEditingWo(false);
+    }
+  };
+
+  const handleDeleteWo = async () => {
+    if (!deleteWoTarget) return;
+    try {
+      setDeletingWo(true);
+      const res = await fetch(`/api/work-orders/${deleteWoTarget.id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      if (res.ok) {
+        if (selectedWo && selectedWo.id === deleteWoTarget.id) {
+          setSelectedWo(null);
+          setExecutionDetails(null);
+        }
+        setDeleteWoTarget(null);
+        fetchWorkOrders();
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Failed to delete work order');
+      }
+    } catch (err) {
+      alert('Server error deleting work order');
+    } finally {
+      setDeletingWo(false);
+    }
+  };
 
   const fetchWorkOrders = async () => {
     try {
@@ -451,13 +551,34 @@ export const WorkOrdersView = () => {
                         {wo.due_date ? new Date(wo.due_date).toLocaleDateString() : '—'}
                       </td>
                       <td className="py-4 px-4 text-right">
-                        <button
-                          onClick={() => openExecutionModal(wo)}
-                          className="inline-flex items-center gap-1 text-xs font-semibold text-cyan-400 hover:text-cyan-300 bg-cyan-950/40 hover:bg-cyan-900/50 border border-cyan-800/60 px-3 py-1.5 rounded-lg transition"
-                        >
-                          {t('work_orders.view_execute')}
-                          <ChevronRight size={14} />
-                        </button>
+                        <div className="inline-flex items-center gap-1.5 justify-end">
+                          <button
+                            onClick={() => openExecutionModal(wo)}
+                            title={t('work_orders.view_execute')}
+                            className="inline-flex items-center gap-1 text-xs font-semibold text-cyan-400 hover:text-cyan-300 bg-cyan-950/40 hover:bg-cyan-900/50 border border-cyan-800/60 px-3 py-1.5 rounded-lg transition"
+                          >
+                            {t('work_orders.view_execute')}
+                            <ChevronRight size={14} />
+                          </button>
+                          {['admin', 'manager'].includes(user?.role) && (
+                            <button
+                              onClick={() => handleOpenEditWo(wo)}
+                              title={t('work_orders.edit_wo')}
+                              className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-cyan-400 transition"
+                            >
+                              <Edit size={14} />
+                            </button>
+                          )}
+                          {user?.role === 'admin' && (
+                            <button
+                              onClick={() => setDeleteWoTarget(wo)}
+                              title={t('work_orders.delete_wo')}
+                              className="p-1.5 rounded-lg bg-slate-800 hover:bg-red-950/60 text-slate-300 hover:text-red-400 transition"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   );
@@ -485,12 +606,32 @@ export const WorkOrdersView = () => {
                   {selectedWo.asset_id} • {selectedWo.equipment_name}
                 </p>
               </div>
-              <button
-                onClick={() => { setSelectedWo(null); setExecutionDetails(null); }}
-                className="text-slate-400 hover:text-white text-lg font-mono"
-              >
-                ✕
-              </button>
+              <div className="flex items-center gap-2">
+                {['admin', 'manager'].includes(user?.role) && (
+                  <button
+                    onClick={() => handleOpenEditWo(selectedWo)}
+                    title={t('work_orders.edit_wo')}
+                    className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-cyan-400 transition"
+                  >
+                    <Edit size={16} />
+                  </button>
+                )}
+                {user?.role === 'admin' && (
+                  <button
+                    onClick={() => setDeleteWoTarget(selectedWo)}
+                    title={t('work_orders.delete_wo')}
+                    className="p-1.5 rounded-lg bg-slate-800 hover:bg-red-950/60 text-slate-300 hover:text-red-400 transition"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                )}
+                <button
+                  onClick={() => { setSelectedWo(null); setExecutionDetails(null); }}
+                  className="text-slate-400 hover:text-white text-lg font-mono ml-1"
+                >
+                  ✕
+                </button>
+              </div>
             </div>
 
             {loadingDetails ? (
@@ -921,6 +1062,233 @@ export const WorkOrdersView = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Work Order Modal */}
+      {showEditModal && editWo && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full p-6 shadow-2xl my-8">
+            <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-6">
+              <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                <Edit className="text-cyan-400" size={20} />
+                {t('work_orders.edit_modal_title')} ({editWo.wo_number})
+              </h2>
+              <button
+                onClick={() => setShowEditModal(false)}
+                className="text-slate-400 hover:text-white text-lg font-mono"
+              >
+                ✕
+              </button>
+            </div>
+
+            {editWoError && (
+              <div className="mb-4 bg-red-950/50 border border-red-800 text-red-300 text-xs p-3 rounded-lg">
+                {editWoError}
+              </div>
+            )}
+
+            <form onSubmit={handleUpdateWo} className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                    {t('work_orders.equipment')} *
+                  </label>
+                  <select
+                    value={editWo.equipment_id}
+                    onChange={(e) => setEditWo({ ...editWo, equipment_id: e.target.value })}
+                    required
+                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500"
+                  >
+                    <option value="">-- {t('parts_requests.select_machine')} --</option>
+                    {equipmentList.map((eq) => (
+                      <option key={eq.id} value={eq.id}>
+                        {eq.asset_id} - {eq.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                    {t('work_orders.type')} *
+                  </label>
+                  <select
+                    value={editWo.type}
+                    onChange={(e) => setEditWo({ ...editWo, type: e.target.value })}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500"
+                  >
+                    <option value="Corrective">Corrective Repair</option>
+                    <option value="Preventive">Preventive Maintenance</option>
+                    <option value="Inspection">Safety / Operational Inspection</option>
+                    <option value="Emergency">Emergency Breakdown</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                  {t('work_orders.col_title')} *
+                </label>
+                <input
+                  type="text"
+                  value={editWo.title}
+                  onChange={(e) => setEditWo({ ...editWo, title: e.target.value })}
+                  required
+                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                  Detailed Description
+                </label>
+                <textarea
+                  value={editWo.description}
+                  onChange={(e) => setEditWo({ ...editWo, description: e.target.value })}
+                  rows={2}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                    {t('work_orders.priority')}
+                  </label>
+                  <select
+                    value={editWo.priority}
+                    onChange={(e) => setEditWo({ ...editWo, priority: e.target.value })}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500"
+                  >
+                    <option value="Critical">Critical (Line Down)</option>
+                    <option value="High">High</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Low">Low</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                    {t('work_orders.status')}
+                  </label>
+                  <select
+                    value={editWo.status}
+                    onChange={(e) => setEditWo({ ...editWo, status: e.target.value })}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500"
+                  >
+                    <option value="Open">Open</option>
+                    <option value="Assigned">Assigned</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="On Hold">On Hold</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Closed">Closed</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                    {t('work_orders.assigned_tech')}
+                  </label>
+                  <select
+                    value={editWo.assigned_to}
+                    onChange={(e) => setEditWo({ ...editWo, assigned_to: e.target.value })}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500"
+                  >
+                    <option value="">-- Unassigned --</option>
+                    {techList.map((t) => (
+                      <option key={t.id} value={t.id}>
+                        {t.full_name} ({t.role})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                    {t('work_orders.due_date')}
+                  </label>
+                  <input
+                    type="date"
+                    value={editWo.due_date}
+                    onChange={(e) => setEditWo({ ...editWo, due_date: e.target.value })}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                  Estimated Hours
+                </label>
+                <input
+                  type="number"
+                  step="0.5"
+                  min="0.1"
+                  value={editWo.estimated_hours}
+                  onChange={(e) => setEditWo({ ...editWo, estimated_hours: parseFloat(e.target.value) || 1.0 })}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500"
+                />
+              </div>
+
+              <div className="flex justify-end gap-3 pt-4 border-t border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setShowEditModal(false)}
+                  className="px-4 py-2 text-sm text-slate-400 hover:text-white"
+                >
+                  {t('common.cancel')}
+                </button>
+                <button
+                  type="submit"
+                  disabled={editingWo}
+                  className="bg-cyan-600 hover:bg-cyan-500 text-white text-sm font-semibold px-5 py-2 rounded-lg shadow-md shadow-cyan-900/30 transition"
+                >
+                  {editingWo ? t('common.loading') : t('common.save')}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Work Order Confirmation Modal */}
+      {deleteWoTarget && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-red-900/50 rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <div className="flex items-center gap-3 text-red-400">
+              <div className="p-3 bg-red-950/80 rounded-full border border-red-800">
+                <AlertTriangle size={24} />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-white">{t('work_orders.delete_wo')}</h3>
+                <p className="text-xs text-slate-400 font-mono">{deleteWoTarget.wo_number}</p>
+              </div>
+            </div>
+
+            <p className="text-xs text-slate-300">
+              {t('work_orders.delete_wo_confirm', { wo: `${deleteWoTarget.wo_number} (${deleteWoTarget.title})` })}
+            </p>
+
+            <div className="flex justify-end gap-2 pt-3 border-t border-slate-800">
+              <button
+                type="button"
+                onClick={() => setDeleteWoTarget(null)}
+                disabled={deletingWo}
+                className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-xs font-medium"
+              >
+                {t('common.cancel')}
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteWo}
+                disabled={deletingWo}
+                className="px-4 py-1.5 bg-red-600 hover:bg-red-500 text-white rounded text-xs font-semibold shadow-md shadow-red-950/40"
+              >
+                {deletingWo ? t('common.loading') : t('common.delete')}
+              </button>
+            </div>
           </div>
         </div>
       )}

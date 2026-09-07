@@ -206,6 +206,136 @@ router.put('/:id/status', requireRole(['admin', 'manager']), async (req, res) =>
   }
 });
 
+// PUT /api/parts-requests/:id - Update parts request details (Admin, Manager, or Requester if Submitted)
+router.put('/:id', async (req, res) => {
+  try {
+    const reqId = parseInt(req.params.id, 10);
+    const { equipment_id, part_id, part_description, quantity, reason, urgency } = req.body;
+
+    const currentRes = await query('SELECT * FROM parts_requests WHERE id = $1', [reqId]);
+    if (currentRes.rows.length === 0) {
+      return res.status(404).json({ error: 'Parts request not found' });
+    }
+    const current = currentRes.rows[0];
+
+    // Permission check
+    const isManagerOrAdmin = ['admin', 'manager'].includes(req.user.role);
+    const isOwnerSubmitted = current.user_id === req.user.id && current.status === 'Submitted';
+
+    if (!isManagerOrAdmin && !isOwnerSubmitted) {
+      return res.status(403).json({ error: 'Forbidden: You cannot modify this parts request' });
+    }
+
+    const updates = [];
+    const values = [];
+    let idx = 1;
+
+    if (equipment_id !== undefined) {
+      const eqId = parseInt(equipment_id, 10);
+      if (req.user.role === 'operator' && !req.user.assigned_equipment_ids.includes(eqId)) {
+        return res.status(403).json({ error: 'Forbidden: You can only assign machines within your scope' });
+      }
+      updates.push(`equipment_id = $${idx++}`);
+      values.push(eqId);
+    }
+
+    if (part_id !== undefined) {
+      updates.push(`part_id = $${idx++}`);
+      values.push(part_id ? parseInt(part_id, 10) : null);
+    }
+
+    if (part_description !== undefined) {
+      updates.push(`part_description = $${idx++}`);
+      values.push(part_description.trim());
+    }
+
+    if (quantity !== undefined) {
+      updates.push(`quantity = $${idx++}`);
+      values.push(Math.max(1, parseInt(quantity, 10) || 1));
+    }
+
+    if (reason !== undefined) {
+      updates.push(`reason = $${idx++}`);
+      values.push(reason ? reason.trim() : null);
+    }
+
+    if (urgency !== undefined) {
+      if (!['Low', 'Normal', 'Urgent'].includes(urgency)) {
+        return res.status(400).json({ error: 'Invalid urgency' });
+      }
+      updates.push(`urgency = $${idx++}`);
+      values.push(urgency);
+    }
+
+    if (updates.length === 0) {
+      return res.status(400).json({ error: 'No fields provided for update' });
+    }
+
+    updates.push(`updated_at = NOW()`);
+    values.push(reqId);
+
+    const updateRes = await query(
+      `UPDATE parts_requests SET ${updates.join(', ')} WHERE id = $${idx} RETURNING *`,
+      values
+    );
+
+    // Audit log
+    await query(
+      'INSERT INTO audit_log (user_id, action, entity_type, entity_id, details) VALUES ($1, $2, $3, $4, $5)',
+      [req.user.id, 'UPDATE_PARTS_REQUEST', 'parts_request', reqId, JSON.stringify({ request_number: updateRes.rows[0].request_number })]
+    );
+
+    res.json({ message: 'Parts request updated', request: updateRes.rows[0] });
+  } catch (error) {
+    console.error('[parts-requests PUT /:id] Error:', error);
+    res.status(500).json({ error: 'Server error updating parts request' });
+  }
+});
+
+// DELETE /api/parts-requests/:id - Delete parts request (Admin, Manager, or Requester if Submitted)
+router.delete('/:id', async (req, res) => {
+  try {
+    const reqId = parseInt(req.params.id, 10);
+    const checkRes = await query('SELECT * FROM parts_requests WHERE id = $1', [reqId]);
+    if (checkRes.rows.length === 0) {
+      return res.status(404).json({ error: 'Parts request not found' });
+    }
+    const current = checkRes.rows[0];
+
+    const isManagerOrAdmin = ['admin', 'manager'].includes(req.user.role);
+    const isOwnerSubmitted = current.user_id === req.user.id && current.status === 'Submitted';
+
+    if (!isManagerOrAdmin && !isOwnerSubmitted) {
+      return res.status(403).json({ error: 'Forbidden: You cannot delete this parts request' });
+    }
+
+    // Clean up photos from disk
+    try {
+      const photosRes = await query('SELECT file_path FROM parts_request_photos WHERE request_id = $1', [reqId]);
+      for (const p of photosRes.rows) {
+        if (p.file_path && fs.existsSync(p.file_path)) {
+          fs.unlinkSync(p.file_path);
+        }
+      }
+    } catch (err) {
+      console.warn('[parts-requests DELETE photo cleanup]', err.message);
+    }
+
+    await query('DELETE FROM parts_requests WHERE id = $1', [reqId]);
+
+    // Audit log
+    await query(
+      'INSERT INTO audit_log (user_id, action, entity_type, entity_id, details) VALUES ($1, $2, $3, $4, $5)',
+      [req.user.id, 'DELETE_PARTS_REQUEST', 'parts_request', reqId, JSON.stringify({ request_number: current.request_number })]
+    );
+
+    res.json({ message: `Parts request '${current.request_number}' deleted successfully` });
+  } catch (error) {
+    console.error('[parts-requests DELETE /:id] Error:', error);
+    res.status(500).json({ error: 'Server error deleting parts request' });
+  }
+});
+
 // GET /api/parts-requests/photos/:id - Serve compressed photo
 router.get('/photos/:id', async (req, res) => {
   try {

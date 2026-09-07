@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { 
   Calendar, Clock, CheckCircle2, AlertTriangle, AlertCircle, Plus, 
-  RefreshCw, Play, Wrench, Shield, CheckSquare, Trash2, ChevronRight, Gauge
+  RefreshCw, Play, Wrench, Shield, CheckSquare, Trash2, ChevronRight, Gauge,
+  Edit
 } from 'lucide-react';
 
 export const PMSchedulesView = () => {
@@ -35,6 +36,137 @@ export const PMSchedulesView = () => {
   });
   const [addError, setAddError] = useState('');
   const [saving, setSaving] = useState(false);
+
+  // Edit Schedule Modal
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editSchedule, setEditSchedule] = useState(null);
+  const [editError, setEditError] = useState('');
+  const [savingEdit, setSavingEdit] = useState(false);
+
+  // Delete Schedule Modal
+  const [deleteScheduleTarget, setDeleteScheduleTarget] = useState(null);
+  const [deletingSchedule, setDeletingSchedule] = useState(false);
+
+  const handleOpenEditSchedule = (sch) => {
+    let cl = [];
+    if (Array.isArray(sch.checklist)) {
+      cl = sch.checklist.map((item, idx) => {
+        if (typeof item === 'string') return { id: `t${idx + 1}`, task: item, completed: false };
+        return { id: item.id || `t${idx + 1}`, task: item.task || '', completed: false };
+      });
+    }
+    if (cl.length === 0) {
+      cl = [{ id: 't1', task: '', completed: false }];
+    }
+
+    setEditSchedule({
+      id: sch.id,
+      schedule_code: sch.schedule_code,
+      equipment_id: sch.equipment_id ? String(sch.equipment_id) : '',
+      title: sch.title || '',
+      description: sch.description || '',
+      trigger_type: sch.trigger_type || 'calendar',
+      calendar_interval_days: sch.calendar_interval_days || 30,
+      meter_interval_hours: sch.meter_interval_hours || 500,
+      estimated_duration_hours: sch.estimated_duration_hours || 1.5,
+      priority: sch.priority || 'Medium',
+      assigned_to: sch.assigned_to ? String(sch.assigned_to) : '',
+      checklist: cl,
+    });
+    setEditError('');
+    setShowEditModal(true);
+  };
+
+  const handleAddEditChecklistTask = () => {
+    if (!editSchedule) return;
+    const nextId = `t${editSchedule.checklist.length + 1}`;
+    setEditSchedule({
+      ...editSchedule,
+      checklist: [...editSchedule.checklist, { id: nextId, task: '', completed: false }],
+    });
+  };
+
+  const handleRemoveEditChecklistTask = (index) => {
+    if (!editSchedule) return;
+    const updated = editSchedule.checklist.filter((_, i) => i !== index);
+    setEditSchedule({ ...editSchedule, checklist: updated });
+  };
+
+  const handleEditChecklistChange = (index, value) => {
+    if (!editSchedule) return;
+    const updated = [...editSchedule.checklist];
+    updated[index].task = value;
+    setEditSchedule({ ...editSchedule, checklist: updated });
+  };
+
+  const handleUpdateSchedule = async (e) => {
+    e.preventDefault();
+    setEditError('');
+    if (!editSchedule.equipment_id || !editSchedule.title) {
+      setEditError('Equipment and title are required');
+      return;
+    }
+
+    const cleanedChecklist = editSchedule.checklist
+      .filter((item) => item.task.trim() !== '')
+      .map((item, idx) => ({ id: `t${idx + 1}`, task: item.task.trim(), completed: false }));
+
+    try {
+      setSavingEdit(true);
+      const res = await fetch(`/api/pm-schedules/${editSchedule.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          equipment_id: editSchedule.equipment_id,
+          title: editSchedule.title,
+          description: editSchedule.description,
+          trigger_type: editSchedule.trigger_type,
+          calendar_interval_days: editSchedule.calendar_interval_days,
+          meter_interval_hours: editSchedule.meter_interval_hours,
+          estimated_duration_hours: editSchedule.estimated_duration_hours,
+          priority: editSchedule.priority,
+          assigned_to: editSchedule.assigned_to || null,
+          checklist: cleanedChecklist,
+        }),
+      });
+
+      if (res.ok) {
+        setShowEditModal(false);
+        setEditSchedule(null);
+        fetchSchedules();
+      } else {
+        const data = await res.json();
+        setEditError(data.error || 'Failed to update schedule');
+      }
+    } catch (err) {
+      setEditError('Server error updating PM schedule');
+    } finally {
+      setSavingEdit(false);
+    }
+  };
+
+  const handleDeleteSchedule = async () => {
+    if (!deleteScheduleTarget) return;
+    try {
+      setDeletingSchedule(true);
+      const res = await fetch(`/api/pm-schedules/${deleteScheduleTarget.id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      if (res.ok) {
+        setDeleteScheduleTarget(null);
+        fetchSchedules();
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Failed to delete schedule');
+      }
+    } catch (err) {
+      alert('Server error deleting PM schedule');
+    } finally {
+      setDeletingSchedule(false);
+    }
+  };
 
   const fetchSchedules = async () => {
     try {
@@ -352,16 +484,36 @@ export const PMSchedulesView = () => {
                       </td>
                       <td className="py-4 px-4">{getStatusBadge(sch)}</td>
                       <td className="py-4 px-4 text-right">
-                        {['admin', 'manager', 'technician'].includes(user?.role) && (
-                          <button
-                            onClick={() => handleTriggerNow(sch.id)}
-                            title={t('pm_schedules.trigger_wo_btn')}
-                            className="inline-flex items-center gap-1 text-xs font-medium text-cyan-400 hover:text-cyan-300 bg-cyan-950/40 hover:bg-cyan-900/50 border border-cyan-800/60 px-2.5 py-1.5 rounded-lg transition"
-                          >
-                            <Play size={12} />
-                            {t('pm_schedules.trigger_wo_btn')}
-                          </button>
-                        )}
+                        <div className="inline-flex items-center gap-1.5 justify-end">
+                          {['admin', 'manager', 'technician'].includes(user?.role) && (
+                            <button
+                              onClick={() => handleTriggerNow(sch.id)}
+                              title={t('pm_schedules.trigger_wo_btn')}
+                              className="inline-flex items-center gap-1 text-xs font-medium text-cyan-400 hover:text-cyan-300 bg-cyan-950/40 hover:bg-cyan-900/50 border border-cyan-800/60 px-2.5 py-1.5 rounded-lg transition"
+                            >
+                              <Play size={12} />
+                              {t('pm_schedules.trigger_wo_btn')}
+                            </button>
+                          )}
+                          {['admin', 'manager'].includes(user?.role) && (
+                            <button
+                              onClick={() => handleOpenEditSchedule(sch)}
+                              title={t('pm_schedules.edit_schedule')}
+                              className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-cyan-400 transition"
+                            >
+                              <Edit size={14} />
+                            </button>
+                          )}
+                          {user?.role === 'admin' && (
+                            <button
+                              onClick={() => setDeleteScheduleTarget(sch)}
+                              title={t('pm_schedules.delete_schedule')}
+                              className="p-1.5 rounded-lg bg-slate-800 hover:bg-red-950/60 text-slate-300 hover:text-red-400 transition"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   );
@@ -583,6 +735,259 @@ export const PMSchedulesView = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit PM Schedule Modal */}
+      {showEditModal && editSchedule && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full p-6 shadow-2xl my-8">
+            <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-6">
+              <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                <Edit className="text-cyan-400" size={20} />
+                {t('pm_schedules.edit_modal_title')} ({editSchedule.schedule_code})
+              </h2>
+              <button
+                onClick={() => setShowEditModal(false)}
+                className="text-slate-400 hover:text-white text-lg font-mono"
+              >
+                ✕
+              </button>
+            </div>
+
+            {editError && (
+              <div className="mb-4 bg-red-950/50 border border-red-800 text-red-300 text-xs p-3 rounded-lg">
+                {editError}
+              </div>
+            )}
+
+            <form onSubmit={handleUpdateSchedule} className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                    {t('pm_schedules.equipment')} *
+                  </label>
+                  <select
+                    value={editSchedule.equipment_id}
+                    onChange={(e) => setEditSchedule({ ...editSchedule, equipment_id: e.target.value })}
+                    required
+                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500"
+                  >
+                    <option value="">-- {t('parts_requests.select_machine')} --</option>
+                    {equipmentList.map((eq) => (
+                      <option key={eq.id} value={eq.id}>
+                        {eq.asset_id} - {eq.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                    {t('pm_schedules.assigned_to')}
+                  </label>
+                  <select
+                    value={editSchedule.assigned_to}
+                    onChange={(e) => setEditSchedule({ ...editSchedule, assigned_to: e.target.value })}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500"
+                  >
+                    <option value="">-- Unassigned --</option>
+                    {techList.map((tech) => (
+                      <option key={tech.id} value={tech.id}>
+                        {tech.full_name} ({tech.role})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                  PM Title *
+                </label>
+                <input
+                  type="text"
+                  value={editSchedule.title}
+                  onChange={(e) => setEditSchedule({ ...editSchedule, title: e.target.value })}
+                  required
+                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                  Description / Objective
+                </label>
+                <textarea
+                  value={editSchedule.description}
+                  onChange={(e) => setEditSchedule({ ...editSchedule, description: e.target.value })}
+                  rows={2}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                    {t('pm_schedules.trigger_type')}
+                  </label>
+                  <select
+                    value={editSchedule.trigger_type}
+                    onChange={(e) => setEditSchedule({ ...editSchedule, trigger_type: e.target.value })}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500"
+                  >
+                    <option value="calendar">Calendar (Days)</option>
+                    <option value="meter">Meter (Hours)</option>
+                    <option value="both">Both (Whichever First)</option>
+                  </select>
+                </div>
+
+                {['calendar', 'both'].includes(editSchedule.trigger_type) && (
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                      Days Cadence
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      value={editSchedule.calendar_interval_days}
+                      onChange={(e) => setEditSchedule({ ...editSchedule, calendar_interval_days: parseInt(e.target.value, 10) || 1 })}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500"
+                    />
+                  </div>
+                )}
+
+                {['meter', 'both'].includes(editSchedule.trigger_type) && (
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                      Operating Hours
+                    </label>
+                    <input
+                      type="number"
+                      min="10"
+                      step="10"
+                      value={editSchedule.meter_interval_hours}
+                      onChange={(e) => setEditSchedule({ ...editSchedule, meter_interval_hours: parseFloat(e.target.value) || 10 })}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500"
+                    />
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                    {t('pm_schedules.priority')}
+                  </label>
+                  <select
+                    value={editSchedule.priority}
+                    onChange={(e) => setEditSchedule({ ...editSchedule, priority: e.target.value })}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500"
+                  >
+                    <option value="Critical">Critical</option>
+                    <option value="High">High</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Low">Low</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Checklist Builder */}
+              <div className="border-t border-slate-800 pt-4">
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-xs font-semibold text-slate-200">
+                    {t('pm_schedules.checklist_title')}
+                  </label>
+                  <button
+                    type="button"
+                    onClick={handleAddEditChecklistTask}
+                    className="text-xs text-cyan-400 hover:text-cyan-300 font-semibold"
+                  >
+                    {t('pm_schedules.add_task_btn')}
+                  </button>
+                </div>
+
+                <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                  {editSchedule.checklist.map((item, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <span className="text-xs text-slate-500 font-mono w-6">{index + 1}.</span>
+                      <input
+                        type="text"
+                        value={item.task}
+                        onChange={(e) => handleEditChecklistChange(index, e.target.value)}
+                        placeholder={t('pm_schedules.task_placeholder')}
+                        className="flex-1 bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-cyan-500"
+                      />
+                      {editSchedule.checklist.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveEditChecklistTask(index)}
+                          className="text-slate-500 hover:text-red-400 p-1"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-4 border-t border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setShowEditModal(false)}
+                  className="px-4 py-2 text-sm text-slate-400 hover:text-white"
+                >
+                  {t('common.cancel')}
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingEdit}
+                  className="bg-cyan-600 hover:bg-cyan-500 text-white text-sm font-semibold px-5 py-2 rounded-lg shadow-md shadow-cyan-900/30 transition"
+                >
+                  {savingEdit ? t('common.loading') : t('common.save')}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete PM Schedule Confirmation Modal */}
+      {deleteScheduleTarget && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-red-900/50 rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <div className="flex items-center gap-3 text-red-400">
+              <div className="p-3 bg-red-950/80 rounded-full border border-red-800">
+                <AlertTriangle size={24} />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-white">{t('pm_schedules.delete_schedule')}</h3>
+                <p className="text-xs text-slate-400 font-mono">{deleteScheduleTarget.schedule_code}</p>
+              </div>
+            </div>
+
+            <p className="text-xs text-slate-300">
+              {t('pm_schedules.delete_schedule_confirm', { code: `${deleteScheduleTarget.schedule_code} (${deleteScheduleTarget.title})` })}
+            </p>
+
+            <div className="flex justify-end gap-2 pt-3 border-t border-slate-800">
+              <button
+                type="button"
+                onClick={() => setDeleteScheduleTarget(null)}
+                disabled={deletingSchedule}
+                className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-xs font-medium"
+              >
+                {t('common.cancel')}
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteSchedule}
+                disabled={deletingSchedule}
+                className="px-4 py-1.5 bg-red-600 hover:bg-red-500 text-white rounded text-xs font-semibold shadow-md shadow-red-950/40"
+              >
+                {deletingSchedule ? t('common.loading') : t('common.delete')}
+              </button>
+            </div>
           </div>
         </div>
       )}

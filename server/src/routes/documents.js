@@ -104,4 +104,40 @@ router.get('/documents/:id/download', async (req, res) => {
   }
 });
 
+// DELETE /api/documents/:id - Delete document (Admin, Manager)
+router.delete('/documents/:id', requireRole(['admin', 'manager']), async (req, res) => {
+  try {
+    const docId = parseInt(req.params.id, 10);
+    const docRes = await query('SELECT * FROM documents WHERE id = $1', [docId]);
+
+    if (docRes.rows.length === 0) {
+      return res.status(404).json({ error: 'Document not found' });
+    }
+
+    const doc = docRes.rows[0];
+
+    // Remove file from disk
+    if (doc.file_path && fs.existsSync(doc.file_path)) {
+      try {
+        fs.unlinkSync(doc.file_path);
+      } catch (err) {
+        console.warn('[documents delete] Could not delete disk file:', err.message);
+      }
+    }
+
+    await query('DELETE FROM documents WHERE id = $1', [docId]);
+
+    // Audit log
+    await query(
+      'INSERT INTO audit_log (user_id, action, entity_type, entity_id, details) VALUES ($1, $2, $3, $4, $5)',
+      [req.user.id, 'DELETE_DOCUMENT', 'document', docId, JSON.stringify({ title: doc.title, equipment_id: doc.equipment_id })]
+    );
+
+    res.json({ message: 'Document deleted successfully' });
+  } catch (error) {
+    console.error('[documents route DELETE] Error:', error);
+    res.status(500).json({ error: 'Server error deleting document' });
+  }
+});
+
 export default router;

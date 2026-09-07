@@ -77,6 +77,7 @@ router.put('/:id', requireRole(['admin', 'manager', 'technician']), async (req, 
   try {
     const partId = parseInt(req.params.id, 10);
     const {
+      part_number,
       name,
       description,
       category,
@@ -88,10 +89,23 @@ router.put('/:id', requireRole(['admin', 'manager', 'technician']), async (req, 
       preferred_vendor_id,
     } = req.body;
 
+    // Check existing
+    const existing = await query('SELECT * FROM parts WHERE id = $1', [partId]);
+    if (existing.rows.length === 0) return res.status(404).json({ error: 'Part not found' });
+
+    if (part_number && part_number.trim().toUpperCase() !== existing.rows[0].part_number) {
+      const dup = await query('SELECT id FROM parts WHERE part_number = $1 AND id != $2', [part_number.trim().toUpperCase(), partId]);
+      if (dup.rows.length > 0) return res.status(400).json({ error: `Part number '${part_number}' already exists` });
+    }
+
     const updates = [];
     const values = [];
     let paramIndex = 1;
 
+    if (part_number !== undefined) {
+      updates.push(`part_number = $${paramIndex++}`);
+      values.push(part_number.trim().toUpperCase());
+    }
     if (name !== undefined) {
       updates.push(`name = $${paramIndex++}`);
       values.push(name.trim());
@@ -122,7 +136,7 @@ router.put('/:id', requireRole(['admin', 'manager', 'technician']), async (req, 
     }
     if (storage_bin !== undefined) {
       updates.push(`storage_bin = $${paramIndex++}`);
-      values.push(storage_bin.trim());
+      values.push(storage_bin ? storage_bin.trim() : null);
     }
     if (preferred_vendor_id !== undefined) {
       updates.push(`preferred_vendor_id = $${paramIndex++}`);
@@ -141,14 +155,41 @@ router.put('/:id', requireRole(['admin', 'manager', 'technician']), async (req, 
       values
     );
 
-    if (updateRes.rows.length === 0) {
-      return res.status(404).json({ error: 'Part not found' });
-    }
+    // Audit log
+    await query(
+      'INSERT INTO audit_log (user_id, action, entity_type, entity_id, details) VALUES ($1, $2, $3, $4, $5)',
+      [req.user.id, 'UPDATE_PART', 'part', partId, JSON.stringify({ part_number: updateRes.rows[0].part_number, name: updateRes.rows[0].name })]
+    );
 
     res.json({ message: 'Part updated', part: updateRes.rows[0] });
   } catch (error) {
     console.error('[parts route PUT /:id] Error:', error);
     res.status(500).json({ error: 'Server error updating part' });
+  }
+});
+
+// DELETE /api/parts/:id - Delete catalog part (Admin only)
+router.delete('/:id', requireRole(['admin']), async (req, res) => {
+  try {
+    const partId = parseInt(req.params.id, 10);
+    const checkRes = await query('SELECT id, part_number, name FROM parts WHERE id = $1', [partId]);
+    if (checkRes.rows.length === 0) {
+      return res.status(404).json({ error: 'Part not found' });
+    }
+    const part = checkRes.rows[0];
+
+    await query('DELETE FROM parts WHERE id = $1', [partId]);
+
+    // Audit log
+    await query(
+      'INSERT INTO audit_log (user_id, action, entity_type, entity_id, details) VALUES ($1, $2, $3, $4, $5)',
+      [req.user.id, 'DELETE_PART', 'part', partId, JSON.stringify({ part_number: part.part_number, name: part.name })]
+    );
+
+    res.json({ message: `Part '${part.part_number}' deleted successfully` });
+  } catch (error) {
+    console.error('[parts route DELETE /:id] Error:', error);
+    res.status(500).json({ error: 'Server error deleting part' });
   }
 });
 

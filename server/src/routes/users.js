@@ -80,11 +80,29 @@ router.post('/', requireRole(['admin']), async (req, res) => {
 router.put('/:id', requireRole(['admin']), async (req, res) => {
   try {
     const targetUserId = parseInt(req.params.id, 10);
-    const { full_name, role, language_preference, is_active } = req.body;
+    const { username, email, full_name, role, language_preference, is_active } = req.body;
 
     const updates = [];
     const values = [];
     let paramIndex = 1;
+
+    if (username !== undefined) {
+      const cleanUsername = username.trim().toLowerCase();
+      if (!cleanUsername) return res.status(400).json({ error: 'Username cannot be empty' });
+      const dup = await query('SELECT id FROM users WHERE username = $1 AND id != $2', [cleanUsername, targetUserId]);
+      if (dup.rows.length > 0) return res.status(400).json({ error: 'Username already taken' });
+      updates.push(`username = $${paramIndex++}`);
+      values.push(cleanUsername);
+    }
+
+    if (email !== undefined) {
+      const cleanEmail = email.trim().toLowerCase();
+      if (!cleanEmail) return res.status(400).json({ error: 'Email cannot be empty' });
+      const dup = await query('SELECT id FROM users WHERE email = $1 AND id != $2', [cleanEmail, targetUserId]);
+      if (dup.rows.length > 0) return res.status(400).json({ error: 'Email already in use' });
+      updates.push(`email = $${paramIndex++}`);
+      values.push(cleanEmail);
+    }
 
     if (full_name !== undefined) {
       updates.push(`full_name = $${paramIndex++}`);
@@ -126,6 +144,11 @@ router.put('/:id', requireRole(['admin']), async (req, res) => {
     if (updateRes.rows.length === 0) {
       return res.status(404).json({ error: 'User not found' });
     }
+
+    await query(
+      'INSERT INTO audit_log (user_id, action, entity_type, entity_id, details) VALUES ($1, $2, $3, $4, $5)',
+      [req.user.id, 'UPDATE_USER', 'user', targetUserId, JSON.stringify({ username: updateRes.rows[0].username, role: updateRes.rows[0].role })]
+    );
 
     res.json({ message: 'User updated', user: updateRes.rows[0] });
   } catch (error) {
@@ -208,6 +231,37 @@ router.put('/:id/assignments', requireRole(['admin', 'manager']), async (req, re
   } catch (error) {
     console.error('[users route assignments] Error:', error);
     res.status(500).json({ error: 'Server error updating operator assignments' });
+  }
+});
+
+// DELETE /api/users/:id (Admin only)
+router.delete('/:id', requireRole(['admin']), async (req, res) => {
+  try {
+    const targetUserId = parseInt(req.params.id, 10);
+
+    // Prevent self-deletion
+    if (req.user.id === targetUserId) {
+      return res.status(400).json({ error: 'Cannot delete your own administrator account' });
+    }
+
+    const checkRes = await query('SELECT id, username, full_name, role FROM users WHERE id = $1', [targetUserId]);
+    if (checkRes.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    const targetUser = checkRes.rows[0];
+
+    await query('DELETE FROM users WHERE id = $1', [targetUserId]);
+
+    // Audit log
+    await query(
+      'INSERT INTO audit_log (user_id, action, entity_type, entity_id, details) VALUES ($1, $2, $3, $4, $5)',
+      [req.user.id, 'DELETE_USER', 'user', targetUserId, JSON.stringify({ username: targetUser.username, role: targetUser.role })]
+    );
+
+    res.json({ message: `User '${targetUser.username}' deleted successfully` });
+  } catch (error) {
+    console.error('[users route DELETE /:id] Error:', error);
+    res.status(500).json({ error: 'Server error deleting user' });
   }
 });
 

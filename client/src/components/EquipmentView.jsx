@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { 
   Wrench, AlertTriangle, CheckCircle, Clock, FileText, 
   Upload, Plus, Search, MapPin, Building, ShieldAlert,
-  Download, Eye, Filter
+  Download, Eye, Filter, Edit, Trash2
 } from 'lucide-react';
 
 export const EquipmentView = () => {
@@ -23,6 +23,15 @@ export const EquipmentView = () => {
   const [assetDocs, setAssetDocs] = useState([]);
   const [assetHistory, setAssetHistory] = useState([]);
   const [showDetailModal, setShowDetailModal] = useState(false);
+
+  // Edit Asset Modal
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editAsset, setEditAsset] = useState(null);
+  const [editError, setEditError] = useState('');
+
+  // Delete Asset Modal / State
+  const [deleteAssetTarget, setDeleteAssetTarget] = useState(null);
+  const [deletingAsset, setDeletingAsset] = useState(false);
 
   // New Asset Modal
   const [showAddModal, setShowAddModal] = useState(false);
@@ -135,6 +144,91 @@ export const EquipmentView = () => {
       fetchEquipment();
     } catch (err) {
       setAddError(err.message);
+    }
+  };
+
+  const handleOpenEdit = (asset) => {
+    setEditAsset({
+      id: asset.id,
+      asset_id: asset.asset_id || '',
+      name: asset.name || '',
+      category: asset.category || 'Cutting',
+      location_id: asset.location_id || '',
+      vendor_id: asset.vendor_id || '',
+      model_number: asset.model_number || '',
+      serial_number: asset.serial_number || '',
+      criticality: asset.criticality || 'Medium',
+      status: asset.status || 'Active',
+      runtime_hours: asset.runtime_hours || 0,
+      description: asset.description || '',
+      install_date: asset.install_date ? asset.install_date.split('T')[0] : '',
+      warranty_expiry_date: asset.warranty_expiry_date ? asset.warranty_expiry_date.split('T')[0] : '',
+    });
+    setEditError('');
+    setShowEditModal(true);
+  };
+
+  const handleUpdateAsset = async (e) => {
+    e.preventDefault();
+    setEditError('');
+    try {
+      const res = await fetch(`/api/equipment/${editAsset.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editAsset),
+        credentials: 'include',
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to update equipment');
+      setShowEditModal(false);
+      setEditAsset(null);
+      fetchEquipment();
+      if (selectedAsset && selectedAsset.id === editAsset.id) {
+        setSelectedAsset(data.equipment);
+      }
+    } catch (err) {
+      setEditError(err.message);
+    }
+  };
+
+  const handleDeleteAsset = async () => {
+    if (!deleteAssetTarget) return;
+    setDeletingAsset(true);
+    try {
+      const res = await fetch(`/api/equipment/${deleteAssetTarget.id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to delete equipment');
+      setDeleteAssetTarget(null);
+      if (selectedAsset && selectedAsset.id === deleteAssetTarget.id) {
+        setShowDetailModal(false);
+        setSelectedAsset(null);
+      }
+      fetchEquipment();
+    } catch (err) {
+      alert('Delete failed: ' + err.message);
+    } finally {
+      setDeletingAsset(false);
+    }
+  };
+
+  const handleDeleteDocument = async (docId) => {
+    if (!window.confirm(t('equipment.delete_doc_confirm'))) return;
+    try {
+      const res = await fetch(`/api/documents/${docId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      if (res.ok) {
+        setAssetDocs(assetDocs.filter((d) => d.id !== docId));
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Failed to delete document');
+      }
+    } catch (err) {
+      alert('Error deleting document: ' + err.message);
     }
   };
 
@@ -366,16 +460,38 @@ export const EquipmentView = () => {
 
               {/* Card Footer Actions */}
               <div className="flex items-center justify-between pt-3 border-t border-slate-800/80">
-                <div className="text-[11px] text-slate-500">
+                <div className="text-[11px] text-slate-500 truncate max-w-[130px]">
                   {asset.vendor_name ? `OEM: ${asset.vendor_name}` : ''}
                 </div>
-                <button
-                  onClick={() => openAssetDetail(asset)}
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-cyan-400 hover:text-cyan-300 bg-cyan-950/50 hover:bg-cyan-900/50 border border-cyan-800/60 px-3 py-1.5 rounded-lg transition"
-                >
-                  <Eye size={14} />
-                  {t('equipment.details')} & {t('equipment.documents')}
-                </button>
+                <div className="flex items-center gap-1.5">
+                  {['admin', 'manager'].includes(user?.role) && (
+                    <>
+                      <button
+                        onClick={() => handleOpenEdit(asset)}
+                        title={t('equipment.edit_asset')}
+                        className="p-1.5 text-slate-400 hover:text-cyan-300 hover:bg-slate-800 rounded-lg transition"
+                      >
+                        <Edit size={14} />
+                      </button>
+                      {user?.role === 'admin' && (
+                        <button
+                          onClick={() => setDeleteAssetTarget(asset)}
+                          title={t('equipment.delete_asset')}
+                          className="p-1.5 text-slate-400 hover:text-red-400 hover:bg-red-950/40 rounded-lg transition"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      )}
+                    </>
+                  )}
+                  <button
+                    onClick={() => openAssetDetail(asset)}
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-cyan-400 hover:text-cyan-300 bg-cyan-950/50 hover:bg-cyan-900/50 border border-cyan-800/60 px-3 py-1.5 rounded-lg transition"
+                  >
+                    <Eye size={14} />
+                    {t('equipment.details')}
+                  </button>
+                </div>
               </div>
             </div>
           ))}
@@ -398,12 +514,23 @@ export const EquipmentView = () => {
                 <h3 className="text-lg font-bold text-white mt-1">{selectedAsset.name}</h3>
                 <p className="text-xs text-slate-400">{selectedAsset.specific_location || selectedAsset.area}</p>
               </div>
-              <button
-                onClick={() => setShowDetailModal(false)}
-                className="text-slate-400 hover:text-white text-lg font-bold px-2 py-1"
-              >
-                ✕
-              </button>
+              <div className="flex items-center gap-2">
+                {['admin', 'manager'].includes(user?.role) && (
+                  <button
+                    onClick={() => handleOpenEdit(selectedAsset)}
+                    className="inline-flex items-center gap-1 bg-slate-800 hover:bg-slate-700 text-cyan-400 text-xs px-2.5 py-1.5 rounded-lg border border-slate-700 transition"
+                  >
+                    <Edit size={13} />
+                    {t('equipment.edit_asset')}
+                  </button>
+                )}
+                <button
+                  onClick={() => setShowDetailModal(false)}
+                  className="text-slate-400 hover:text-white text-lg font-bold px-2 py-1"
+                >
+                  ✕
+                </button>
+              </div>
             </div>
 
             {/* Status Changer (for techs, managers, admins) */}
@@ -522,15 +649,26 @@ export const EquipmentView = () => {
                           </div>
                         </div>
                       </div>
-                      <a
-                        href={`/api/documents/${doc.id}/download`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="p-1.5 text-cyan-400 hover:bg-cyan-950/50 rounded transition"
-                        title="View / Download"
-                      >
-                        <Download size={16} />
-                      </a>
+                      <div className="flex items-center gap-1">
+                        <a
+                          href={`/api/documents/${doc.id}/download`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="p-1.5 text-cyan-400 hover:bg-cyan-950/50 rounded transition"
+                          title="View / Download"
+                        >
+                          <Download size={16} />
+                        </a>
+                        {['admin', 'manager'].includes(user?.role) && (
+                          <button
+                            onClick={() => handleDeleteDocument(doc.id)}
+                            className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-950/40 rounded transition"
+                            title={t('equipment.delete_doc')}
+                          >
+                            <Trash2 size={15} />
+                          </button>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -673,6 +811,209 @@ export const EquipmentView = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Asset Modal */}
+      {showEditModal && editAsset && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-slate-900 border border-slate-800 rounded-xl max-w-lg w-full p-6 space-y-4 shadow-2xl my-8">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <h3 className="text-base font-bold text-white flex items-center gap-2">
+                <Edit size={18} className="text-cyan-400" />
+                {t('equipment.edit_modal_title')}
+              </h3>
+              <button onClick={() => { setShowEditModal(false); setEditAsset(null); }} className="text-slate-400 hover:text-white">✕</button>
+            </div>
+
+            {editError && (
+              <div className="p-3 bg-red-950/60 border border-red-800 rounded text-xs text-red-300">
+                {editError}
+              </div>
+            )}
+
+            <form onSubmit={handleUpdateAsset} className="space-y-3 text-xs">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-300 mb-1 font-semibold">{t('equipment.asset_id')} *</label>
+                  <input
+                    type="text"
+                    required
+                    value={editAsset.asset_id}
+                    onChange={(e) => setEditAsset({ ...editAsset, asset_id: e.target.value })}
+                    className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-slate-200"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-300 mb-1 font-semibold">{t('equipment.category')} *</label>
+                  <input
+                    type="text"
+                    required
+                    value={editAsset.category}
+                    onChange={(e) => setEditAsset({ ...editAsset, category: e.target.value })}
+                    className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-slate-200"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-slate-300 mb-1 font-semibold">{t('equipment.name')} *</label>
+                <input
+                  type="text"
+                  required
+                  value={editAsset.name}
+                  onChange={(e) => setEditAsset({ ...editAsset, name: e.target.value })}
+                  className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-slate-200"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-300 mb-1 font-semibold">{t('equipment.serial')}</label>
+                  <input
+                    type="text"
+                    value={editAsset.serial_number}
+                    onChange={(e) => setEditAsset({ ...editAsset, serial_number: e.target.value })}
+                    className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-slate-200"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-300 mb-1 font-semibold">Model #</label>
+                  <input
+                    type="text"
+                    value={editAsset.model_number}
+                    onChange={(e) => setEditAsset({ ...editAsset, model_number: e.target.value })}
+                    className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-slate-200"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-300 mb-1 font-semibold">{t('equipment.location')}</label>
+                  <select
+                    value={editAsset.location_id || ''}
+                    onChange={(e) => setEditAsset({ ...editAsset, location_id: e.target.value })}
+                    className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-slate-200"
+                  >
+                    <option value="">Select Location</option>
+                    {locations.map((l) => (
+                      <option key={l.id} value={l.id}>{l.building} — {l.area}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-slate-300 mb-1 font-semibold">{t('equipment.criticality')}</label>
+                  <select
+                    value={editAsset.criticality}
+                    onChange={(e) => setEditAsset({ ...editAsset, criticality: e.target.value })}
+                    className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-slate-200"
+                  >
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                    <option value="Critical">Critical</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-300 mb-1 font-semibold">{t('equipment.status')}</label>
+                  <select
+                    value={editAsset.status}
+                    onChange={(e) => setEditAsset({ ...editAsset, status: e.target.value })}
+                    className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-slate-200"
+                  >
+                    <option value="Active">Active / Running</option>
+                    <option value="Down">Down / Out of Service</option>
+                    <option value="In Storage">In Storage</option>
+                    <option value="Retired">Retired</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-slate-300 mb-1 font-semibold">{t('equipment.runtime_hours')}</label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    value={editAsset.runtime_hours}
+                    onChange={(e) => setEditAsset({ ...editAsset, runtime_hours: e.target.value })}
+                    className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-slate-200 font-mono"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-slate-300 mb-1 font-semibold">Description</label>
+                <textarea
+                  rows="2"
+                  value={editAsset.description || ''}
+                  onChange={(e) => setEditAsset({ ...editAsset, description: e.target.value })}
+                  className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-slate-200"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-4 border-t border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => { setShowEditModal(false); setEditAsset(null); }}
+                  className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded font-medium"
+                >
+                  {t('common.cancel')}
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded font-medium shadow-md shadow-cyan-900/30"
+                >
+                  {t('common.save')}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Asset Confirmation Modal */}
+      {deleteAssetTarget && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-red-900/60 rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <div className="flex items-center gap-3 text-red-400">
+              <div className="p-2 bg-red-950 rounded-lg border border-red-800">
+                <AlertTriangle size={20} />
+              </div>
+              <h3 className="text-base font-bold text-white">
+                {t('equipment.delete_asset')}
+              </h3>
+            </div>
+
+            <p className="text-xs text-slate-300">
+              {t('equipment.delete_asset_confirm', { asset: `${deleteAssetTarget.asset_id} (${deleteAssetTarget.name})` })}
+            </p>
+
+            <div className="p-2.5 bg-red-950/40 border border-red-900/50 rounded text-[11px] text-red-300">
+              {t('common.delete_warning')}
+            </div>
+
+            <div className="flex justify-end gap-2 pt-3 border-t border-slate-800">
+              <button
+                type="button"
+                disabled={deletingAsset}
+                onClick={() => setDeleteAssetTarget(null)}
+                className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-xs font-medium"
+              >
+                {t('common.cancel')}
+              </button>
+              <button
+                type="button"
+                disabled={deletingAsset}
+                onClick={handleDeleteAsset}
+                className="px-4 py-1.5 bg-red-600 hover:bg-red-500 text-white rounded text-xs font-semibold shadow-md shadow-red-900/40 transition disabled:opacity-50"
+              >
+                {deletingAsset ? t('common.deleting') : t('common.delete')}
+              </button>
+            </div>
           </div>
         </div>
       )}

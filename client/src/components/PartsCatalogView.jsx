@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { 
   Wrench, Plus, AlertTriangle, CheckCircle, Search, 
-  MapPin, DollarSign, PackageCheck, Layers, Filter 
+  MapPin, DollarSign, PackageCheck, Layers, Filter,
+  Edit, Trash2
 } from 'lucide-react';
 
 export const PartsCatalogView = () => {
@@ -15,6 +16,15 @@ export const PartsCatalogView = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('ALL');
+
+  // Edit Part Modal State
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editPart, setEditPart] = useState(null);
+  const [editError, setEditError] = useState('');
+
+  // Delete Part Modal State
+  const [deletePartTarget, setDeletePartTarget] = useState(null);
+  const [deletingPart, setDeletingPart] = useState(false);
 
   // Add Part Modal
   const [showAddModal, setShowAddModal] = useState(false);
@@ -63,6 +73,63 @@ export const PartsCatalogView = () => {
     fetchParts();
     fetchVendors();
   }, []);
+
+  const handleOpenEditPart = (part) => {
+    setEditPart({
+      id: part.id,
+      part_number: part.part_number || '',
+      name: part.name || '',
+      description: part.description || '',
+      category: part.category || 'Cutting Consumable',
+      quantity_on_hand: part.quantity_on_hand || 0,
+      min_stock_level: part.min_stock_level || 0,
+      reorder_point: part.reorder_point || 0,
+      unit_cost: part.unit_cost || 0,
+      storage_bin: part.storage_bin || '',
+      preferred_vendor_id: part.preferred_vendor_id || '',
+    });
+    setEditError('');
+    setShowEditModal(true);
+  };
+
+  const handleUpdatePart = async (e) => {
+    e.preventDefault();
+    setEditError('');
+    try {
+      const res = await fetch(`/api/parts/${editPart.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editPart),
+        credentials: 'include',
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to update part');
+      setShowEditModal(false);
+      setEditPart(null);
+      fetchParts();
+    } catch (err) {
+      setEditError(err.message);
+    }
+  };
+
+  const handleDeletePart = async () => {
+    if (!deletePartTarget) return;
+    setDeletingPart(true);
+    try {
+      const res = await fetch(`/api/parts/${deletePartTarget.id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to delete part');
+      setDeletePartTarget(null);
+      fetchParts();
+    } catch (err) {
+      alert('Delete failed: ' + err.message);
+    } finally {
+      setDeletingPart(false);
+    }
+  };
 
   const handleCreatePart = async (e) => {
     e.preventDefault();
@@ -179,6 +246,9 @@ export const PartsCatalogView = () => {
                   <th className="px-4 py-3.5">{t('catalog.cost')}</th>
                   <th className="px-4 py-3.5">{t('catalog.vendor')}</th>
                   <th className="px-4 py-3.5 text-right">{t('catalog.status')}</th>
+                  {['admin', 'manager'].includes(user?.role) && (
+                    <th className="px-4 py-3.5 text-right">{t('common.actions')}</th>
+                  )}
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60">
@@ -227,6 +297,28 @@ export const PartsCatalogView = () => {
                         </span>
                       )}
                     </td>
+                    {['admin', 'manager'].includes(user?.role) && (
+                      <td className="px-4 py-3.5 text-right">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            onClick={() => handleOpenEditPart(p)}
+                            title={t('catalog.edit_part_btn')}
+                            className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-cyan-400 transition"
+                          >
+                            <Edit size={14} />
+                          </button>
+                          {user?.role === 'admin' && (
+                            <button
+                              onClick={() => setDeletePartTarget(p)}
+                              title={t('catalog.delete_part_btn')}
+                              className="p-1.5 rounded-lg bg-slate-800 hover:bg-red-950/60 text-slate-300 hover:text-red-400 transition"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
@@ -378,6 +470,198 @@ export const PartsCatalogView = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Part Modal */}
+      {showEditModal && editPart && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <h3 className="text-base font-bold text-white flex items-center gap-2">
+                <Edit size={18} className="text-cyan-400" />
+                {t('catalog.edit_modal_title')}
+              </h3>
+              <button onClick={() => setShowEditModal(false)} className="text-slate-400 hover:text-white">✕</button>
+            </div>
+
+            {editError && (
+              <div className="p-3 bg-red-950/60 border border-red-800 rounded text-xs text-red-300">
+                {editError}
+              </div>
+            )}
+
+            <form onSubmit={handleUpdatePart} className="space-y-3 text-xs">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-300 mb-1 font-semibold">{t('catalog.part_number')} *</label>
+                  <input
+                    type="text"
+                    required
+                    value={editPart.part_number}
+                    onChange={(e) => setEditPart({ ...editPart, part_number: e.target.value })}
+                    className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-slate-200"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-300 mb-1 font-semibold">{t('catalog.category')} *</label>
+                  <input
+                    type="text"
+                    required
+                    value={editPart.category}
+                    onChange={(e) => setEditPart({ ...editPart, category: e.target.value })}
+                    className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-slate-200"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-slate-300 mb-1 font-semibold">{t('catalog.name')} *</label>
+                <input
+                  type="text"
+                  required
+                  value={editPart.name}
+                  onChange={(e) => setEditPart({ ...editPart, name: e.target.value })}
+                  className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-slate-200"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-300 mb-1 font-semibold">{t('common.description') || 'Description'}</label>
+                <textarea
+                  rows={2}
+                  value={editPart.description}
+                  onChange={(e) => setEditPart({ ...editPart, description: e.target.value })}
+                  className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-slate-200"
+                />
+              </div>
+
+              <div className="grid grid-cols-3 gap-2">
+                <div>
+                  <label className="block text-slate-300 mb-1 font-semibold">{t('catalog.stock')}</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={editPart.quantity_on_hand}
+                    onChange={(e) => setEditPart({ ...editPart, quantity_on_hand: parseInt(e.target.value, 10) || 0 })}
+                    className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-slate-200 font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-300 mb-1 font-semibold">Min Level</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={editPart.min_stock_level}
+                    onChange={(e) => setEditPart({ ...editPart, min_stock_level: parseInt(e.target.value, 10) || 0 })}
+                    className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-slate-200 font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-300 mb-1 font-semibold">Reorder Point</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={editPart.reorder_point}
+                    onChange={(e) => setEditPart({ ...editPart, reorder_point: parseInt(e.target.value, 10) || 0 })}
+                    className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-slate-200 font-mono"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-300 mb-1 font-semibold">{t('catalog.cost')} ($)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={editPart.unit_cost}
+                    onChange={(e) => setEditPart({ ...editPart, unit_cost: parseFloat(e.target.value) || 0 })}
+                    className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-slate-200 font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-300 mb-1 font-semibold">{t('catalog.bin')}</label>
+                  <input
+                    type="text"
+                    value={editPart.storage_bin}
+                    onChange={(e) => setEditPart({ ...editPart, storage_bin: e.target.value })}
+                    className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-slate-200"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-slate-300 mb-1 font-semibold">{t('catalog.vendor')}</label>
+                <select
+                  value={editPart.preferred_vendor_id}
+                  onChange={(e) => setEditPart({ ...editPart, preferred_vendor_id: e.target.value })}
+                  className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-slate-200"
+                >
+                  <option value="">-- None / Unknown --</option>
+                  {vendors.map((v) => (
+                    <option key={v.id} value={v.id}>{v.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-3 border-t border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setShowEditModal(false)}
+                  className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded font-medium"
+                >
+                  {t('common.cancel')}
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded font-medium shadow-md shadow-cyan-900/30"
+                >
+                  {t('common.save')}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Part Confirmation Modal */}
+      {deletePartTarget && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-red-900/50 rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <div className="flex items-center gap-3 text-red-400">
+              <div className="p-3 bg-red-950/80 rounded-full border border-red-800">
+                <AlertTriangle size={24} />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-white">{t('catalog.delete_part_btn')}</h3>
+                <p className="text-xs text-slate-400 font-mono">{deletePartTarget.part_number} - {deletePartTarget.name}</p>
+              </div>
+            </div>
+
+            <p className="text-xs text-slate-300">
+              {t('catalog.delete_part_confirm', { part: `${deletePartTarget.part_number} (${deletePartTarget.name})` })}
+            </p>
+
+            <div className="flex justify-end gap-2 pt-3 border-t border-slate-800">
+              <button
+                type="button"
+                onClick={() => setDeletePartTarget(null)}
+                disabled={deletingPart}
+                className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-xs font-medium"
+              >
+                {t('common.cancel')}
+              </button>
+              <button
+                type="button"
+                onClick={handleDeletePart}
+                disabled={deletingPart}
+                className="px-4 py-1.5 bg-red-600 hover:bg-red-500 text-white rounded text-xs font-semibold shadow-md shadow-red-950/40"
+              >
+                {deletingPart ? t('common.loading') : t('common.delete')}
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { 
   Package, Plus, AlertCircle, Camera, CheckCircle2, Clock, 
   Filter, MessageSquare, ExternalLink, Image as ImageIcon, ShieldAlert,
-  ChevronRight, CheckSquare, XCircle, ArrowRight
+  ChevronRight, CheckSquare, XCircle, ArrowRight, Edit, Trash2
 } from 'lucide-react';
 
 export const PartsRequestsView = () => {
@@ -37,8 +37,109 @@ export const PartsRequestsView = () => {
   const [reviewNotes, setReviewNotes] = useState('');
   const [updatingStatus, setUpdatingStatus] = useState(false);
 
+  // Edit Request Modal
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editRequest, setEditRequest] = useState(null);
+  const [editingRequest, setEditingRequest] = useState(false);
+  const [editRequestError, setEditRequestError] = useState('');
+
+  // Delete Request Modal
+  const [deleteRequestTarget, setDeleteRequestTarget] = useState(null);
+  const [deletingRequest, setDeletingRequest] = useState(false);
+
   // Photo Lightbox
   const [activePhotoUrl, setActivePhotoUrl] = useState(null);
+
+  const handleOpenEditRequest = (req) => {
+    setEditRequest({
+      id: req.id,
+      request_number: req.request_number,
+      equipment_id: req.equipment_id ? String(req.equipment_id) : '',
+      part_id: req.part_id ? String(req.part_id) : '',
+      part_description: req.part_description || '',
+      quantity: req.quantity || 1,
+      urgency: req.urgency || 'Normal',
+      reason: req.reason || '',
+    });
+    setEditRequestError('');
+    setShowEditModal(true);
+  };
+
+  const handleEditCatalogPartSelect = (partId) => {
+    if (!partId) {
+      setEditRequest({ ...editRequest, part_id: '', part_description: '' });
+      return;
+    }
+    const found = catalogParts.find((p) => String(p.id) === String(partId));
+    if (found) {
+      setEditRequest({
+        ...editRequest,
+        part_id: found.id,
+        part_description: `${found.part_number} - ${found.name}`,
+      });
+    }
+  };
+
+  const handleUpdateRequest = async (e) => {
+    e.preventDefault();
+    setEditRequestError('');
+    if (!editRequest.equipment_id || !editRequest.part_description) {
+      setEditRequestError('Equipment and part description are required');
+      return;
+    }
+
+    try {
+      setEditingRequest(true);
+      const res = await fetch(`/api/parts-requests/${editRequest.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          equipment_id: parseInt(editRequest.equipment_id, 10),
+          part_id: editRequest.part_id ? parseInt(editRequest.part_id, 10) : null,
+          part_description: editRequest.part_description,
+          quantity: parseInt(editRequest.quantity, 10) || 1,
+          urgency: editRequest.urgency,
+          reason: editRequest.reason,
+        }),
+      });
+
+      if (res.ok) {
+        setShowEditModal(false);
+        setEditRequest(null);
+        fetchRequests();
+      } else {
+        const data = await res.json();
+        setEditRequestError(data.error || 'Failed to update request');
+      }
+    } catch (err) {
+      setEditRequestError('Server error updating request');
+    } finally {
+      setEditingRequest(false);
+    }
+  };
+
+  const handleDeleteRequest = async () => {
+    if (!deleteRequestTarget) return;
+    try {
+      setDeletingRequest(true);
+      const res = await fetch(`/api/parts-requests/${deleteRequestTarget.id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      if (res.ok) {
+        setDeleteRequestTarget(null);
+        fetchRequests();
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Failed to delete request');
+      }
+    } catch (err) {
+      alert('Server error deleting request');
+    } finally {
+      setDeletingRequest(false);
+    }
+  };
 
   const fetchRequests = async () => {
     try {
@@ -357,6 +458,28 @@ export const PartsRequestsView = () => {
                     {t('parts_requests.review_btn')}
                   </button>
                 )}
+
+                {/* Edit Button */}
+                {(['admin', 'manager'].includes(user?.role) || (req.requested_by === user?.id && req.status === 'Submitted')) && (
+                  <button
+                    onClick={() => handleOpenEditRequest(req)}
+                    title={t('parts_requests.edit_request')}
+                    className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-cyan-400 border border-slate-700 transition"
+                  >
+                    <Edit size={14} />
+                  </button>
+                )}
+
+                {/* Delete Button */}
+                {(user?.role === 'admin' || (req.requested_by === user?.id && req.status === 'Submitted')) && (
+                  <button
+                    onClick={() => setDeleteRequestTarget(req)}
+                    title={t('parts_requests.delete_request')}
+                    className="p-2 rounded-lg bg-slate-800 hover:bg-red-950/60 text-slate-300 hover:text-red-400 border border-slate-700 transition"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                )}
               </div>
             </div>
           ))}
@@ -614,6 +737,179 @@ export const PartsRequestsView = () => {
             >
               ✕
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Parts Request Modal */}
+      {showEditModal && editRequest && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <h3 className="text-base font-bold text-white flex items-center gap-2">
+                <Edit size={18} className="text-cyan-400" />
+                {t('parts_requests.edit_modal_title')} ({editRequest.request_number})
+              </h3>
+              <button onClick={() => setShowEditModal(false)} className="text-slate-400 hover:text-white">✕</button>
+            </div>
+
+            {editRequestError && (
+              <div className="p-3 bg-red-950/60 border border-red-800 rounded text-xs text-red-300">
+                {editRequestError}
+              </div>
+            )}
+
+            <form onSubmit={handleUpdateRequest} className="space-y-3 text-xs">
+              <div>
+                <label className="block text-slate-300 mb-1 font-semibold">
+                  {t('parts_requests.select_machine')} *
+                </label>
+                <select
+                  required
+                  value={editRequest.equipment_id}
+                  onChange={(e) => setEditRequest({ ...editRequest, equipment_id: e.target.value })}
+                  className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-2 text-slate-200 focus:ring-1 focus:ring-cyan-500"
+                >
+                  <option value="">-- Choose Machine --</option>
+                  {equipmentList.map((eq) => (
+                    <option key={eq.id} value={eq.id}>
+                      {eq.asset_id} — {eq.name} ({eq.area || 'Anaheim Plant'})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-slate-300 mb-1 font-semibold">
+                  {t('parts_requests.select_catalog')}
+                </label>
+                <select
+                  value={editRequest.part_id}
+                  onChange={(e) => handleEditCatalogPartSelect(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-slate-300"
+                >
+                  <option value="">-- Custom / Non-Catalog Item --</option>
+                  {catalogParts.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.part_number} — {p.name} ({p.quantity_on_hand} in stock)
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-slate-300 mb-1 font-semibold">
+                  {t('parts_requests.or_describe')} *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={editRequest.part_description}
+                  onChange={(e) => setEditRequest({ ...editRequest, part_description: e.target.value })}
+                  className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-slate-200"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-300 mb-1 font-semibold">
+                    {t('parts_requests.quantity')} *
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    required
+                    value={editRequest.quantity}
+                    onChange={(e) => setEditRequest({ ...editRequest, quantity: parseInt(e.target.value, 10) || 1 })}
+                    className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-slate-200 font-mono"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-300 mb-1 font-semibold">
+                    {t('parts_requests.urgency')} *
+                  </label>
+                  <select
+                    value={editRequest.urgency}
+                    onChange={(e) => setEditRequest({ ...editRequest, urgency: e.target.value })}
+                    className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-slate-200"
+                  >
+                    <option value="Normal">Normal</option>
+                    <option value="Urgent">Urgent (Down / Chipping)</option>
+                    <option value="Low">Low (Future PM)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-slate-300 mb-1 font-semibold">
+                  {t('parts_requests.reason')}
+                </label>
+                <textarea
+                  rows="2"
+                  value={editRequest.reason}
+                  onChange={(e) => setEditRequest({ ...editRequest, reason: e.target.value })}
+                  className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-slate-200"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-3 border-t border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setShowEditModal(false)}
+                  className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded font-medium"
+                >
+                  {t('common.cancel')}
+                </button>
+                <button
+                  type="submit"
+                  disabled={editingRequest}
+                  className="px-4 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded font-medium shadow-md shadow-cyan-900/30 disabled:opacity-50"
+                >
+                  {editingRequest ? t('common.loading') : t('common.save')}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Parts Request Confirmation Modal */}
+      {deleteRequestTarget && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-red-900/50 rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <div className="flex items-center gap-3 text-red-400">
+              <div className="p-3 bg-red-950/80 rounded-full border border-red-800">
+                <AlertCircle size={24} />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-white">{t('parts_requests.delete_request')}</h3>
+                <p className="text-xs text-slate-400 font-mono">{deleteRequestTarget.request_number}</p>
+              </div>
+            </div>
+
+            <p className="text-xs text-slate-300">
+              {t('parts_requests.delete_request_confirm', { req: `${deleteRequestTarget.request_number} (${deleteRequestTarget.part_description})` })}
+            </p>
+
+            <div className="flex justify-end gap-2 pt-3 border-t border-slate-800">
+              <button
+                type="button"
+                onClick={() => setDeleteRequestTarget(null)}
+                disabled={deletingRequest}
+                className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-xs font-medium"
+              >
+                {t('common.cancel')}
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteRequest}
+                disabled={deletingRequest}
+                className="px-4 py-1.5 bg-red-600 hover:bg-red-500 text-white rounded text-xs font-semibold shadow-md shadow-red-950/40"
+              >
+                {deletingRequest ? t('common.loading') : t('common.delete')}
+              </button>
+            </div>
           </div>
         </div>
       )}
